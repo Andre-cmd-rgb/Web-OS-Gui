@@ -3,18 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WebOS</title>
-  <link rel="stylesheet" href="static/css/style.css">
+  <title>Web OS Gui</title>
+  <link rel="stylesheet" href="static/css/style.css"> <!-- Include your styles -->
+  <script src="static/js/kernel.js" defer></script>
+  <script src="static/js/window.js" defer></script>
 </head>
 <body>
+
+  <!-- Desktop container where the wallpaper is set -->
   <div id="desktop">
-    <div id="windows-container"></div>
-  </div>
-  
-  <script type="module" src="static/js/kernel.js"></script>
-  <script type="module" src="static/js/fs.js"></script>
-  <script type="module" src="static/js/history.js"></script>
-  <script type="module" src="static/js/commands.js"></script>
-  <script type="module" src="static/js/window.js"></script>
+
+
+  <!-- Taskbar to show minimized windows -->
+  <div id="taskbar"></div>
+
+  <!-- Desktop Icons 
+  <div class="desktop-icon" style="top: 150px; left: 10px;">Icon 1</div>
+  <div class="desktop-icon" style="top: 250px; left: 10px;">Icon 2</div>-->
+
 </body>
 </html>

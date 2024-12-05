@@ -1,42 +1,10 @@
 // kernel.js
 
-// Initialize the taskbar and topbar when the document is ready
+// Initialize the topbar when the document is ready
 document.addEventListener("DOMContentLoaded", function() {
-  setupTaskbar();
   setupTopbar();
   showTime();
 });
-
-// Set up the taskbar and topbar
-function setupTaskbar() {
-  const taskbar = document.createElement("div");
-  taskbar.id = "taskbar";
-  taskbar.style.position = "absolute";
-  taskbar.style.left = "0";
-  taskbar.style.bottom = "0";
-  taskbar.style.width = "100%";
-  taskbar.style.height = "50px";
-  taskbar.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
-  taskbar.style.display = "flex";
-  taskbar.style.justifyContent = "space-between";
-  taskbar.style.alignItems = "center";
-  taskbar.style.padding = "0 10px";
-  taskbar.style.borderTopLeftRadius = "15px";
-  taskbar.style.borderTopRightRadius = "15px";
-
-  // Add application launcher (example)
-  const appLauncher = document.createElement("div");
-  appLauncher.style.color = "white";
-  appLauncher.innerHTML = "<strong>App Launcher</strong>";
-  taskbar.appendChild(appLauncher);
-
-  // Add window buttons (these can be dynamically added based on opened windows)
-  const windowButtons = document.createElement("div");
-  windowButtons.id = "window-buttons";
-  taskbar.appendChild(windowButtons);
-
-  document.body.appendChild(taskbar);
-}
 
 // Set up the topbar with a clock (and other potential items)
 function setupTopbar() {
