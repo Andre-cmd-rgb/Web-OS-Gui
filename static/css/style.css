@@ -1,0 +1,121 @@
+/* Basic reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f0f0f5;
+  height: 100vh;
+  overflow: hidden;
+  font-size: 16px;
+}
+
+#desktop {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-image: url('../wallpapers/wallpaper.png');
+  background-size: cover;  /* Makes the wallpaper cover the entire screen */
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Window styling */
+.window {
+  position: absolute;
+  width: 300px;
+  height: 200px;
+  background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
+  border-radius: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  top: 50px;
+  left: 50px;
+}
+
+.window-header {
+  background-color: rgba(44, 62, 80, 0.8); /* Transparent dark header */
+  color: white;
+  padding: 8px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  font-size: 14px;
+}
+
+.window-header span {
+  font-size: 14px;
+}
+
+.window-header .window-btns {
+  display: flex;
+  gap: 10px;
+}
+
+.window-header .window-btn {
+  width: 12px;
+  height: 12px;
+  background-color: #e74c3c;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+}
+
+.window-header .window-btn:hover {
+  opacity: 0.8;
+}
+
+.window-header .window-btn.maximize {
+  background-color: #f39c12;
+}
+
+.window-header .window-btn.minimize {
+  background-color: #2ecc71;
+}
+
+.window-header .window-btn.close {
+  background-color: #e74c3c;
+}
+
+/* Content styling */
+.window-content {
+  padding: 20px;
+  overflow: auto;
+  height: calc(100% - 40px); /* Adjusts to fit the header and footer */
+}
+
+.resize-handle {
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  width: 20px;
+  height: 20px;
+  cursor: nwse-resize;
+  background-color: #aaa;
+  border-radius: 50%;
+  transition: background-color 0.3s ease;
+}
+
+.resize-handle:hover {
+  background-color: #777;
+}
+
+/* Simple desktop icons */
+.desktop-icon {
+  width: 64px;
+  height: 64px;
+  background-color: #3498db;
+  border-radius: 10px;
+  margin: 10px;
+  text-align: center;
+  line-height: 64px;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  user-select: none;
+}
