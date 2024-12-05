@@ -52,6 +52,8 @@ class Window {
       iframe.src = this.content;
       iframe.style.width = "100%";
       iframe.style.height = "100%";
+      iframe.style.border = "none"; // Remove iframe border
+      iframe.style.overflow = "hidden"; // Hide scrollbars in iframe
       contentDiv.appendChild(iframe);
     } else {
       // Otherwise, load static content
@@ -188,4 +190,4 @@ class Window {
 const webApp = new Window("Terminal", "https://andre-cmd-rgb.github.io/Web-OS/");
 
 // Create a static window
-const staticWindow = new Window("Static Window", "<h1>Static Content</h1><p>This is a static window with HTML content.</p>");
+const staticWindow = new Window("Test Window", "<h1>Test Window</h1><p>This is a test window with HTML content.</p>");
