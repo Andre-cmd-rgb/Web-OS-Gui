@@ -1,10 +1,22 @@
 class Window {
-  constructor(title, content, iconPath = "static/app-icons/app.png") {
+  constructor(title, content, iconPath = "static/app-icons/app.png", options = {}) {
     this.title = title;
     this.content = content;
     this.iconPath = iconPath;
     this.isMinimized = false;
-    this.taskbarItem = null; // Track taskbar item to avoid duplicates
+    this.taskbarItem = null;
+
+    // Default options with user overrides
+    this.options = {
+      width: options.width || 300,
+      height: options.height || 200,
+      left: options.left || 100,
+      top: options.top || 100,
+      resizable: options.resizable !== false,
+      draggable: options.draggable !== false,
+      isExternal: options.isExternal || false,
+    };
+
     this.createWindow();
   }
 
@@ -19,8 +31,10 @@ class Window {
     windowDiv.classList.add("window");
     windowDiv.setAttribute("id", `window-${this.title}`);
     windowDiv.style.position = "absolute";
-    windowDiv.style.left = "100px";
-    windowDiv.style.top = "100px";
+    windowDiv.style.left = `${this.options.left}px`;
+    windowDiv.style.top = `${this.options.top}px`;
+    windowDiv.style.width = `${this.options.width}px`;
+    windowDiv.style.height = `${this.options.height}px`;
     windowDiv.style.zIndex = 1;
 
     const header = document.createElement("div");
@@ -34,45 +48,47 @@ class Window {
       </div>
     `;
 
-    const closeButton = header.querySelector('.close');
-    closeButton.addEventListener('click', () => this.closeWindow(windowDiv));
+    const closeButton = header.querySelector(".close");
+    closeButton.addEventListener("click", () => this.closeWindow(windowDiv));
 
-    const maximizeButton = header.querySelector('.maximize');
-    maximizeButton.addEventListener('click', () => this.toggleMaximize(windowDiv));
+    const maximizeButton = header.querySelector(".maximize");
+    maximizeButton.addEventListener("click", () => this.toggleMaximize(windowDiv));
 
-    const minimizeButton = header.querySelector('.minimize');
-    minimizeButton.addEventListener('click', () => this.minimizeWindow(windowDiv));
+    const minimizeButton = header.querySelector(".minimize");
+    minimizeButton.addEventListener("click", () => this.minimizeWindow(windowDiv));
 
     const contentDiv = document.createElement("div");
     contentDiv.classList.add("window-content");
 
-    // Check if the content is a URL, then create an iframe for web apps
-    if (this.isURL(this.content)) {
+    if (this.options.isExternal || this.isURL(this.content)) {
       const iframe = document.createElement("iframe");
       iframe.src = this.content;
       iframe.style.width = "100%";
       iframe.style.height = "100%";
-      iframe.style.border = "none"; // Remove iframe border
-      iframe.style.overflow = "hidden"; // Hide scrollbars in iframe
+      iframe.style.border = "none";
+      iframe.style.overflow = "hidden";
+      iframe.scrolling = "no";
       contentDiv.appendChild(iframe);
     } else {
-      // Otherwise, load static content
       contentDiv.innerHTML = this.content;
     }
 
     windowDiv.appendChild(header);
     windowDiv.appendChild(contentDiv);
 
-    const resizeHandle = document.createElement("div");
-    resizeHandle.classList.add("resize-handle");
-    windowDiv.appendChild(resizeHandle);
+    if (this.options.resizable) {
+      const resizeHandle = document.createElement("div");
+      resizeHandle.classList.add("resize-handle");
+      windowDiv.appendChild(resizeHandle);
+      this.makeWindowResizable(windowDiv, resizeHandle);
+    }
 
     windowsContainer.appendChild(windowDiv);
 
-    this.makeWindowDraggable(windowDiv);
-    this.makeWindowResizable(windowDiv, resizeHandle);
+    if (this.options.draggable) {
+      this.makeWindowDraggable(windowDiv);
+    }
 
-    // Add to taskbar only if window is not minimized
     if (!this.isMinimized) {
       this.addToTaskbar();
     }
@@ -90,7 +106,6 @@ class Window {
       return;
     }
 
-    // Only create a taskbar item if it doesn't already exist
     if (!document.getElementById(`taskbar-${this.title}`)) {
       this.taskbarItem = document.createElement("div");
       this.taskbarItem.classList.add("taskbar-item");
@@ -106,7 +121,6 @@ class Window {
     windowElement.style.display = "block";
     this.isMinimized = false;
 
-    // Remove taskbar item if exists
     if (this.taskbarItem) {
       this.taskbarItem.remove();
       this.taskbarItem = null;
@@ -119,7 +133,6 @@ class Window {
     windowElement.style.display = "none";
     this.isMinimized = true;
 
-    // Only add taskbar item if not already added
     if (!this.taskbarItem) {
       this.addToTaskbar();
     }
@@ -134,8 +147,8 @@ class Window {
 
   toggleMaximize(windowElement) {
     if (windowElement.style.width === "100%") {
-      windowElement.style.width = "300px";
-      windowElement.style.height = "200px";
+      windowElement.style.width = `${this.options.width}px`;
+      windowElement.style.height = `${this.options.height}px`;
     } else {
       windowElement.style.width = "100%";
       windowElement.style.height = "100%";
@@ -144,10 +157,10 @@ class Window {
 
   makeWindowDraggable(windowElement) {
     let offsetX, offsetY;
-    windowElement.querySelector('.window-header').onmousedown = (e) => {
+    windowElement.querySelector(".window-header").onmousedown = (e) => {
       offsetX = e.clientX - windowElement.getBoundingClientRect().left;
       offsetY = e.clientY - windowElement.getBoundingClientRect().top;
-      
+
       document.onmousemove = (e) => {
         windowElement.style.left = `${e.clientX - offsetX}px`;
         windowElement.style.top = `${e.clientY - offsetY}px`;
@@ -162,7 +175,7 @@ class Window {
 
   makeWindowResizable(windowElement, resizeHandle) {
     let isResizing = false;
-    
+
     resizeHandle.onmousedown = (e) => {
       isResizing = true;
       const initialWidth = windowElement.offsetWidth;
@@ -189,5 +202,55 @@ class Window {
 // Create a new web app (window with embedded webpage)
 const webApp = new Window("Terminal", "https://andre-cmd-rgb.github.io/Web-OS/");
 
-// Create a static window
-const staticWindow = new Window("Test Window", "<h1>Test Window</h1><p>This is a test window with HTML content.</p>");
+new Window("Calculator", "static/apps/calc.html", "static/app-icons/app.png", {
+  width: 320,
+  height: 450,
+  left: 150,
+  top: 100,
+  isExternal: true,
+});
+
+// Change background function
+function changeBackground(imagePath) {
+  const desktop = document.getElementById("desktop");
+  if (desktop) {
+    desktop.style.backgroundImage = `url('${imagePath}')`;
+  }
+}
+
+// Load wallpapers dynamically from a folder and generate preview thumbnails
+function loadWallpapers() {
+  const wallpapers = [
+    'wallpaper-1.png', 'wallpaper-2.png', 'wallpaper-3.jpg', // Add other wallpaper filenames here
+  ];
+
+  const backgroundListDiv = document.querySelector('.background-list');
+  wallpapers.forEach(wallpaper => {
+    const previewImage = document.createElement("img");
+    previewImage.src = `static/wallpapers/${wallpaper}`;
+    previewImage.alt = wallpaper;
+    previewImage.style.width = '100px'; // Preview size (adjust as necessary)
+    previewImage.style.height = 'auto';
+    previewImage.style.margin = '10px';
+    previewImage.onclick = () => changeBackground(`static/wallpapers/${wallpaper}`);
+    backgroundListDiv.appendChild(previewImage);
+  });
+}
+
+// Create "Change Background" app with dynamic content
+const backgroundAppContent = `
+  <div class="background-app">
+    <h3>Select a Background</h3>
+    <div class="background-list" style="display: flex; flex-wrap: wrap; padding: 10px;"></div>
+  </div>
+`;
+
+new Window("Change Background", backgroundAppContent, "static/app-icons/theme.png", {
+  width: 400,
+  height: 300,
+  left: 200,
+  top: 150,
+});
+
+// After the window is created, load the wallpapers
+document.addEventListener('DOMContentLoaded', loadWallpapers);
