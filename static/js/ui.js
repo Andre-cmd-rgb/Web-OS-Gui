@@ -228,7 +228,7 @@ class Window {
     const backgroundListDiv = document.querySelector('.background-list');
     wallpapers.forEach(wallpaper => {
       const previewImage = document.createElement("img");
-      previewImage.src = `static/wallpapers/${wallpaper}`;
+      previewImage.src = `wallpapers/${wallpaper}`;
       previewImage.alt = wallpaper;
       previewImage.style.width = '100px'; // Preview size (adjust as necessary)
       previewImage.style.height = 'auto';
