@@ -285,8 +285,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const notificationManager = new NotificationManager();
 
   new Window("My App", "Welcome to the app!", "app-icons/app.png");
-  new Window("Example App", "Welcome to the Example App!");
-  new Window("Terminal", "https://andre-cmd-rgb.github.io/Web-OS/");
+  new Window("Terminal", "https://andre-cmd-rgb.github.io/Web-OS/", null, {
+    width: 800, // Specify the desired width
+    height: 600, // Specify the desired height
+    left: 100, // Optional positioning
+    top: 50,   // Optional positioning
+  });
+  
   new Window("Calculator", "apps/calc.html", "app-icons/app.png", {
     width: 320,
     height: 450,
