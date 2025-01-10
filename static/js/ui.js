@@ -312,31 +312,7 @@ document.addEventListener("DOMContentLoaded", () => {
     top: 150,
   });
 
-  setTimeout(() => {
-    notificationManager.createNotification(
-      "Example App",
-      "Your process completed successfully!",
-      "success"
-    );
-  }, 2000);
-
-  setTimeout(() => {
-    notificationManager.createNotification(
-      "Example App",
-      "Warning: Low disk space detected.",
-      "warning",
-      7000
-    );
-  }, 5000);
-
-  setTimeout(() => {
-    notificationManager.createNotification(
-      "Example App",
-      "Failed to connect to the server.",
-      "error",
-      0
-    );
-  }, 8000);
+  
 
   function changeBackground(imagePath) {
     const desktop = document.getElementById("desktop");
