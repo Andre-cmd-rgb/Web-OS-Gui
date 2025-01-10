@@ -196,7 +196,124 @@ class Window {
       };
     }
   }
-  
+  // Notification Manager Class
+class NotificationManager {
+  constructor() {
+    this.notificationContainer = document.getElementById("notifications");
+
+    if (!this.notificationContainer) {
+      this.notificationContainer = document.createElement("div");
+      this.notificationContainer.id = "notifications";
+      this.notificationContainer.style.position = "fixed";
+      this.notificationContainer.style.bottom = "20px";
+      this.notificationContainer.style.right = "20px";
+      this.notificationContainer.style.width = "300px";
+      this.notificationContainer.style.zIndex = "1000";
+      document.body.appendChild(this.notificationContainer);
+    }
+  }
+
+  createNotification(title, message, type = "info", duration = 5000) {
+    const notification = document.createElement("div");
+    notification.classList.add("notification", `notification-${type}`);
+    notification.style.position = "relative";
+    notification.style.padding = "10px";
+    notification.style.marginBottom = "10px";
+    notification.style.borderRadius = "5px";
+    notification.style.boxShadow = "0 2px 4px rgba(0, 0, 0, 0.2)";
+    notification.style.backgroundColor = this.getBackgroundColor(type);
+    notification.style.color = "#fff";
+    notification.style.opacity = "0";
+    notification.style.transition = "opacity 0.3s";
+
+    const titleElement = document.createElement("strong");
+    titleElement.innerText = title;
+    titleElement.style.display = "block";
+
+    const messageElement = document.createElement("span");
+    messageElement.innerText = message;
+
+    const closeButton = document.createElement("button");
+    closeButton.innerText = "×";
+    closeButton.style.position = "absolute";
+    closeButton.style.top = "5px";
+    closeButton.style.right = "10px";
+    closeButton.style.border = "none";
+    closeButton.style.background = "transparent";
+    closeButton.style.color = "#fff";
+    closeButton.style.cursor = "pointer";
+    closeButton.style.fontSize = "14px";
+    closeButton.onclick = () => notification.remove();
+
+    notification.appendChild(titleElement);
+    notification.appendChild(messageElement);
+    notification.appendChild(closeButton);
+
+    this.notificationContainer.appendChild(notification);
+
+    // Fade-in effect
+    setTimeout(() => {
+      notification.style.opacity = "1";
+    }, 10);
+
+    // Auto-remove after duration
+    if (duration > 0) {
+      setTimeout(() => {
+        notification.style.opacity = "0";
+        setTimeout(() => notification.remove(), 300);
+      }, duration);
+    }
+  }
+
+  getBackgroundColor(type) {
+    switch (type) {
+      case "success":
+        return "#4caf50";
+      case "error":
+        return "#f44336";
+      case "warning":
+        return "#ff9800";
+      default:
+        return "#2196f3"; // Info
+    }
+  }
+}
+
+// Initialize NotificationManager
+const notificationManager = new NotificationManager();
+
+// Example usage
+document.addEventListener("DOMContentLoaded", () => {
+  const appWindow = new Window("Example App", "Welcome to the Example App!");
+
+  // Simulate sending a notification from the app
+  setTimeout(() => {
+    notificationManager.createNotification(
+      "Example App",
+      "Your process completed successfully!",
+      "success"
+    );
+  }, 2000);
+
+  setTimeout(() => {
+    notificationManager.createNotification(
+      "Example App",
+      "Warning: Low disk space detected.",
+      "warning",
+      7000
+    );
+  }, 5000);
+
+  setTimeout(() => {
+    notificationManager.createNotification(
+      "Example App",
+      "Failed to connect to the server.",
+      "error",
+      0 // Stays until manually dismissed
+    );
+  }, 8000);
+});
+
   // Example usage
   document.addEventListener("DOMContentLoaded", () => {
     const window1 = new Window("My App", "Welcome to the app!", "app-icons/app.png");
