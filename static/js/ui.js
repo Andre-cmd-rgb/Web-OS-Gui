@@ -233,7 +233,7 @@ class Window {
       previewImage.style.width = '100px'; // Preview size (adjust as necessary)
       previewImage.style.height = 'auto';
       previewImage.style.margin = '10px';
-      previewImage.onclick = () => changeBackground('wallpapers/${wallpaper}`) ;
+      previewImage.onclick = () => changeBackground(`wallpapers/${wallpaper}`);
       backgroundListDiv.appendChild(previewImage);
     });
   }
