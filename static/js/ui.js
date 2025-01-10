@@ -1,6 +1,6 @@
 // Define the Window class
 class Window {
-    constructor(title, content, iconPath = "static/app-icons/app.png", options = {}) {
+    constructor(title, content, iconPath = "app-icons/app.png", options = {}) {
       this.title = title;
       this.content = content;
       this.iconPath = iconPath;
@@ -199,11 +199,11 @@ class Window {
   
   // Example usage
   document.addEventListener("DOMContentLoaded", () => {
-    const window1 = new Window("My App", "Welcome to the app!", "static/app-icons/app.png");
+    const window1 = new Window("My App", "Welcome to the app!", "app-icons/app.png");
   });
   const webApp = new Window("Terminal", "https://andre-cmd-rgb.github.io/Web-OS/");
 
-  new Window("Calculator", "static/apps/calc.html", "static/app-icons/app.png", {
+  new Window("Calculator", "apps/calc.html", "app-icons/app.png", {
     width: 320,
     height: 450,
     left: 150,
@@ -233,7 +233,7 @@ class Window {
       previewImage.style.width = '100px'; // Preview size (adjust as necessary)
       previewImage.style.height = 'auto';
       previewImage.style.margin = '10px';
-      previewImage.onclick = () => changeBackground(`static/wallpapers/${wallpaper}`);
+      previewImage.onclick = () => changeBackground('wallpapers/${wallpaper}`);
       backgroundListDiv.appendChild(previewImage);
     });
   }
@@ -246,7 +246,7 @@ class Window {
     </div>
   `;
   
-  new Window("Change Background", backgroundAppContent, "static/app-icons/theme.png", {
+  new Window("Change Background", backgroundAppContent, "app-icons/theme.png", {
     width: 400,
     height: 300,
     left: 200,
