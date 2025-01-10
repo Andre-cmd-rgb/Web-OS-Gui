@@ -290,6 +290,7 @@ document.addEventListener("DOMContentLoaded", () => {
     height: 600, // Specify the desired height
     left: 100, // Optional positioning
     top: 50,   // Optional positioning
+    isExternal: true,
   });
   
   new Window("Calculator", "apps/calc.html", "app-icons/app.png", {
