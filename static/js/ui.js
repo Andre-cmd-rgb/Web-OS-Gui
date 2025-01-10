@@ -279,11 +279,15 @@ class NotificationManager {
   }
 }
 
-// Initialize NotificationManager
-const notificationManager = new NotificationManager();
 
-// Example usage
-document.addEventListener("DOMContentLoaded", () => {
+
+  // Example usage
+  document.addEventListener("DOMContentLoaded", () => {
+    const window1 = new Window("My App", "Welcome to the app!", "app-icons/app.png");
+  });
+  // Initialize NotificationManager
+  const notificationManager = new NotificationManager();
+  
   const appWindow = new Window("Example App", "Welcome to the Example App!");
 
   // Simulate sending a notification from the app
@@ -312,12 +316,6 @@ document.addEventListener("DOMContentLoaded", () => {
       0 // Stays until manually dismissed
     );
   }, 8000);
-});
-
-  // Example usage
-  document.addEventListener("DOMContentLoaded", () => {
-    const window1 = new Window("My App", "Welcome to the app!", "app-icons/app.png");
-  });
   const webApp = new Window("Terminal", "https://andre-cmd-rgb.github.io/Web-OS/");
 
   new Window("Calculator", "apps/calc.html", "app-icons/app.png", {
