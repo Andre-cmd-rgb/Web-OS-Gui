@@ -1,4 +1,3 @@
-// window class
 class Window {
   constructor(title, content, iconPath = "app-icons/app.png", options = {}) {
       this.title = title;
@@ -6,7 +5,6 @@ class Window {
       this.iconPath = iconPath;
       this.isMinimized = false;
       this.taskbarItem = null;
-
 
       this.options = {
           width: options.width || 300,
@@ -37,17 +35,16 @@ class Window {
       windowDiv.style.width = `${this.options.width}px`;
       windowDiv.style.height = `${this.options.height}px`;
 
-
       const header = document.createElement("div");
       header.classList.add("window-header");
       header.innerHTML = `
-      <span>${this.title}</span>
-      <div class="window-btns">
-        <button class="window-btn close"></button>
-        <button class="window-btn maximize"></button>
-        <button class="window-btn minimize"></button>
-      </div>
-    `;
+        <span>${this.title}</span>
+        <div class="window-btns">
+          <button class="window-btn close"></button>
+          <button class="window-btn maximize"></button>
+          <button class="window-btn minimize"></button>
+        </div>
+      `;
 
       header.querySelector(".close").addEventListener("click", () => this.closeWindow(windowDiv));
       header.querySelector(".maximize").addEventListener("click", () => this.toggleMaximize(windowDiv));
