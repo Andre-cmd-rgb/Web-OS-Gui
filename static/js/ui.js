@@ -197,7 +197,7 @@ class NotificationManager {
       this.notificationContainer = document.createElement("div");
       this.notificationContainer.id = "notifications";
       this.notificationContainer.style.position = "fixed";
-      this.notificationContainer.style.top = "20px"; 
+      this.notificationContainer.style.top = "80px"; 
       this.notificationContainer.style.right = "20px";
       this.notificationContainer.style.width = "300px";
       this.notificationContainer.style.zIndex = "1000";
