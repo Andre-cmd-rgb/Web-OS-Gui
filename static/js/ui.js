@@ -1,4 +1,4 @@
-// Define the Window class
+// window class
 class Window {
   constructor(title, content, iconPath = "app-icons/app.png", options = {}) {
       this.title = title;
@@ -7,7 +7,7 @@ class Window {
       this.isMinimized = false;
       this.taskbarItem = null;
 
-      // Default options with user overrides
+
       this.options = {
           width: options.width || 300,
           height: options.height || 200,
@@ -37,7 +37,7 @@ class Window {
       windowDiv.style.width = `${this.options.width}px`;
       windowDiv.style.height = `${this.options.height}px`;
 
-      // Window header
+
       const header = document.createElement("div");
       header.classList.add("window-header");
       header.innerHTML = `
@@ -53,7 +53,6 @@ class Window {
       header.querySelector(".maximize").addEventListener("click", () => this.toggleMaximize(windowDiv));
       header.querySelector(".minimize").addEventListener("click", () => this.minimizeWindow(windowDiv));
 
-      // Window content
       const contentDiv = document.createElement("div");
       contentDiv.classList.add("window-content");
       if (this.options.isExternal || this.isURL(this.content)) {
@@ -70,7 +69,6 @@ class Window {
       windowDiv.appendChild(header);
       windowDiv.appendChild(contentDiv);
 
-      // Add resize functionality
       if (this.options.resizable) {
           const resizeHandle = document.createElement("div");
           resizeHandle.classList.add("resize-handle");
@@ -80,7 +78,6 @@ class Window {
 
       desktop.appendChild(windowDiv);
 
-      // Enable dragging
       if (this.options.draggable) {
           this.makeWindowDraggable(windowDiv);
       }
@@ -194,7 +191,7 @@ class Window {
       };
   }
 }
-  // Notification Manager Class
+
 class NotificationManager {
   constructor() {
     this.notificationContainer = document.getElementById("notifications");
@@ -203,7 +200,7 @@ class NotificationManager {
       this.notificationContainer = document.createElement("div");
       this.notificationContainer.id = "notifications";
       this.notificationContainer.style.position = "fixed";
-      this.notificationContainer.style.bottom = "20px";
+      this.notificationContainer.style.top = "20px"; 
       this.notificationContainer.style.right = "20px";
       this.notificationContainer.style.width = "300px";
       this.notificationContainer.style.zIndex = "1000";
@@ -215,18 +212,21 @@ class NotificationManager {
     const notification = document.createElement("div");
     notification.classList.add("notification", `notification-${type}`);
     notification.style.position = "relative";
-    notification.style.padding = "10px";
+    notification.style.padding = "15px";
     notification.style.marginBottom = "10px";
-    notification.style.borderRadius = "5px";
-    notification.style.boxShadow = "0 2px 4px rgba(0, 0, 0, 0.2)";
+    notification.style.borderRadius = "8px";
+    notification.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.2)";
     notification.style.backgroundColor = this.getBackgroundColor(type);
     notification.style.color = "#fff";
+    notification.style.backdropFilter = "blur(8px)";
     notification.style.opacity = "0";
-    notification.style.transition = "opacity 0.3s";
+    notification.style.transition = "opacity 0.3s, transform 0.3s";
+    notification.style.transform = "translateY(-20px)"; 
 
     const titleElement = document.createElement("strong");
     titleElement.innerText = title;
     titleElement.style.display = "block";
+    titleElement.style.marginBottom = "5px";
 
     const messageElement = document.createElement("span");
     messageElement.innerText = message;
@@ -234,14 +234,15 @@ class NotificationManager {
     const closeButton = document.createElement("button");
     closeButton.innerText = "×";
     closeButton.style.position = "absolute";
-    closeButton.style.top = "5px";
+    closeButton.style.top = "10px";
     closeButton.style.right = "10px";
     closeButton.style.border = "none";
     closeButton.style.background = "transparent";
     closeButton.style.color = "#fff";
     closeButton.style.cursor = "pointer";
-    closeButton.style.fontSize = "14px";
-    closeButton.onclick = () => notification.remove();
+    closeButton.style.fontSize = "18px";
+    closeButton.style.fontWeight = "bold";
+    closeButton.onclick = () => this.removeNotification(notification);
 
     notification.appendChild(titleElement);
     notification.appendChild(messageElement);
@@ -249,46 +250,65 @@ class NotificationManager {
 
     this.notificationContainer.appendChild(notification);
 
-    // Fade-in effect
     setTimeout(() => {
       notification.style.opacity = "1";
+      notification.style.transform = "translateY(0)";
     }, 10);
 
-    // Auto-remove after duration
+
     if (duration > 0) {
-      setTimeout(() => {
-        notification.style.opacity = "0";
-        setTimeout(() => notification.remove(), 300);
-      }, duration);
+      setTimeout(() => this.removeNotification(notification), duration);
     }
+  }
+
+  removeNotification(notification) {
+    notification.style.opacity = "0";
+    notification.style.transform = "translateY(-20px)";
+    setTimeout(() => notification.remove(), 300);
   }
 
   getBackgroundColor(type) {
     switch (type) {
       case "success":
-        return "#4caf50";
+        return "rgba(76, 175, 80, 0.8)"; 
       case "error":
-        return "#f44336";
+        return "rgba(244, 67, 54, 0.8)";
       case "warning":
-        return "#ff9800";
+        return "rgba(255, 152, 0, 0.8)";
       default:
-        return "#2196f3"; // Info
+        return "rgba(33, 150, 243, 0.8)";
     }
   }
 }
 
-
-
-  // Example usage
-  document.addEventListener("DOMContentLoaded", () => {
-    const window1 = new Window("My App", "Welcome to the app!", "app-icons/app.png");
-  });
-  // Initialize NotificationManager
+document.addEventListener("DOMContentLoaded", () => {
   const notificationManager = new NotificationManager();
-  
-  const appWindow = new Window("Example App", "Welcome to the Example App!");
 
-  // Simulate sending a notification from the app
+  new Window("My App", "Welcome to the app!", "app-icons/app.png");
+  new Window("Example App", "Welcome to the Example App!");
+  new Window("Terminal", "https://andre-cmd-rgb.github.io/Web-OS/");
+  new Window("Calculator", "apps/calc.html", "app-icons/app.png", {
+    width: 320,
+    height: 450,
+    left: 150,
+    top: 100,
+    isExternal: true,
+  });
+
+  const backgroundAppContent = `
+    <div class="background-app">
+      <h3>Select a Background</h3>
+      <div class="background-list" style="display: flex; flex-wrap: wrap; padding: 10px;"></div>
+    </div>
+  `;
+
+  new Window("Change Background", backgroundAppContent, "app-icons/theme.png", {
+    width: 400,
+    height: 300,
+    left: 200,
+    top: 150,
+  });
+
   setTimeout(() => {
     notificationManager.createNotification(
       "Example App",
@@ -311,61 +331,32 @@ class NotificationManager {
       "Example App",
       "Failed to connect to the server.",
       "error",
-      0 // Stays until manually dismissed
+      0
     );
   }, 8000);
-  const webApp = new Window("Terminal", "https://andre-cmd-rgb.github.io/Web-OS/");
 
-  new Window("Calculator", "apps/calc.html", "app-icons/app.png", {
-    width: 320,
-    height: 450,
-    left: 150,
-    top: 100,
-    isExternal: true,
-  });
-  
-  // Change background function
   function changeBackground(imagePath) {
     const desktop = document.getElementById("desktop");
     if (desktop) {
       desktop.style.backgroundImage = `url('${imagePath}')`;
     }
   }
-  
-  // Load wallpapers dynamically from a folder and generate preview thumbnails
+
   function loadWallpapers() {
-    const wallpapers = [
-      'wallpaper-1.png', 'wallpaper-2.png', 'wallpaper-3.jpg', // Add other wallpaper filenames here
-    ];
-  
+    const wallpapers = ['wallpaper-1.png', 'wallpaper-2.png', 'wallpaper-3.jpg'];
     const backgroundListDiv = document.querySelector('.background-list');
+
     wallpapers.forEach(wallpaper => {
       const previewImage = document.createElement("img");
       previewImage.src = `wallpapers/${wallpaper}`;
       previewImage.alt = wallpaper;
-      previewImage.style.width = '100px'; // Preview size (adjust as necessary)
+      previewImage.style.width = '100px';
       previewImage.style.height = 'auto';
       previewImage.style.margin = '10px';
       previewImage.onclick = () => changeBackground(`wallpapers/${wallpaper}`);
       backgroundListDiv.appendChild(previewImage);
     });
   }
-  
-  // Create "Change Background" app with dynamic content
-  const backgroundAppContent = `
-    <div class="background-app">
-      <h3>Select a Background</h3>
-      <div class="background-list" style="display: flex; flex-wrap: wrap; padding: 10px;"></div>
-    </div>
-  `;
-  
-  new Window("Change Background", backgroundAppContent, "app-icons/theme.png", {
-    width: 400,
-    height: 300,
-    left: 200,
-    top: 150,
-  });
-  
-  // After the window is created, load the wallpapers
-  document.addEventListener('DOMContentLoaded', loadWallpapers);
-  
+
+  loadWallpapers();
+});
