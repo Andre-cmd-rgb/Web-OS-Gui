@@ -1,12 +1,10 @@
 // kernel.js
 
-// Initialize the topbar when the document is ready
 document.addEventListener("DOMContentLoaded", function() {
   setupTopbar();
   showTime();
 });
 
-// Set up the topbar with a clock (and other potential items)
 function setupTopbar() {
   const topbar = document.createElement("div");
   topbar.id = "topbar";
@@ -22,19 +20,17 @@ function setupTopbar() {
   topbar.style.alignItems = "center";
   topbar.style.padding = "0 10px";
 
-  // Add clock
+  // clock
   const clock = document.createElement("div");
   clock.id = "clock";
   clock.style.fontSize = "14px";
   topbar.appendChild(clock);
 
   document.body.appendChild(topbar);
-
-  // Update time every second
   setInterval(showTime, 1000);
 }
 
-// Show the current time in the clock
+// time in the clock
 function showTime() {
   const clock = document.getElementById("clock");
   const now = new Date();
@@ -44,7 +40,6 @@ function showTime() {
   clock.innerHTML = `${hours}:${minutes}:${seconds}`;
 }
 
-// Function to create a window (called from window.js)
 function createWindow(title, content) {
   const window = new Window(title, content);
 }

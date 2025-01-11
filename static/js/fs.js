@@ -20,8 +20,7 @@ class FileSystem {
         request.onerror = (event) => reject(new Error("Failed to open database: " + event.target.error));
       });
     }
-  
-    // Method to interact with the database
+
     async performTransaction(storeName, operation, mode = "readonly") {
       return new Promise((resolve, reject) => {
         const transaction = this.db.transaction(storeName, mode);
@@ -33,10 +32,10 @@ class FileSystem {
       });
     }
   
-    // Create a directory
+
     async createDirectory(path) {
       if (path.startsWith("/")) {
-        path = path.slice(1); // Remove slash for storage
+        path = path.slice(1); 
       }
   
       const existingEntry = await this.performTransaction(this.storeName, (store) => store.get(path));
@@ -48,10 +47,10 @@ class FileSystem {
       await this.performTransaction(this.storeName, (store) => store.add(entry), "readwrite");
     }
   
-    // Create a file
+
     async createFile(path, data) {
       if (path.startsWith("/")) {
-        path = path.slice(1); // Remove slash for storage
+        path = path.slice(1);
       }
   
       const existingEntry = await this.performTransaction(this.storeName, (store) => store.get(path));
@@ -72,8 +71,7 @@ class FileSystem {
       const entry = { path, type: "file", content: data };
       await this.performTransaction(this.storeName, (store) => store.add(entry), "readwrite");
     }
-  
-    // Write (update) file content
+
     async writeFile(path, data) {
       const entry = await this.performTransaction(this.storeName, (store) => store.get(path));
       if (!entry || entry.type !== "file") {
@@ -84,7 +82,7 @@ class FileSystem {
       await this.performTransaction(this.storeName, (store) => store.put(entry), "readwrite");
     }
   
-    // Read file content
+
     async readFile(path) {
       const entry = await this.performTransaction(this.storeName, (store) => store.get(path));
       if (!entry || entry.type !== "file") {
@@ -92,8 +90,7 @@ class FileSystem {
       }
       return entry.content;
     }
-  
-    // List contents of a directory
+
     async listContents(path) {
       const directory = await this.performTransaction(this.storeName, (store) => store.get(path));
       if (!directory || directory.type !== "directory") {
@@ -102,7 +99,7 @@ class FileSystem {
       return directory.contents || [];
     }
   
-    // Delete file or directory
+
     async deleteEntry(path) {
       const entry = await this.performTransaction(this.storeName, (store) => store.get(path));
       if (!entry) {
@@ -130,11 +127,11 @@ class FileSystem {
       }
     }
   
-    // Helper: Get parent directory from a given path
+    // get parent dir from a given path
     _getParentDirectory(path) {
       const parts = path.split("/");
-      parts.pop(); // Remove file/directory name
-      return parts.join("/") || "/";  // Default to "/" if at the root
+      parts.pop(); // delete/remove/bhdwbyuw file/directory name
+      return parts.join("/") || "/";  //  "/" if at the root
     }
   }
   

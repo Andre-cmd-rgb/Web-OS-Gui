@@ -10,8 +10,8 @@ class Window {
     this.options = {
       width: options.width || 300,
       height: options.height || 200,
-      minWidth: options.minWidth || 150,   // Default minimum width
-      minHeight: options.minHeight || 100, // Default minimum height
+      minWidth: options.minWidth || 150,
+      minHeight: options.minHeight || 100,
       left: options.left || 100,
       top: options.top || 100,
       resizable: options.resizable !== false,
@@ -37,10 +37,9 @@ class Window {
     windowDiv.style.top = `${this.options.top}px`;
     windowDiv.style.width = `${this.options.width}px`;
     windowDiv.style.height = `${this.options.height}px`;
-    windowDiv.style.minWidth = `${this.options.minWidth}px`;   // Apply minimum width
-    windowDiv.style.minHeight = `${this.options.minHeight}px`; // Apply minimum height
+    windowDiv.style.minWidth = `${this.options.minWidth}px`;
+    windowDiv.style.minHeight = `${this.options.minHeight}px`;
 
-    // Add resizable class only if the window is resizable
     if (this.options.resizable) {
       windowDiv.classList.add("resizable");
     }
@@ -91,7 +90,7 @@ class Window {
   }
 
   toggleMaximize(windowElement) {
-    if (!this.options.resizable) return; // Prevent maximizing if not resizable
+    if (!this.options.resizable) return;
 
     if (windowElement.style.width === "100%") {
       windowElement.style.width = `${this.options.width}px`;
@@ -141,7 +140,7 @@ class Window {
   }
 
   makeWindowResizable(windowElement) {
-    if (!this.options.resizable) return; // Don't create the resize handle if not resizable
+    if (!this.options.resizable) return;
 
     let isResizing = false;
     const resizeHandle = document.createElement("div");
@@ -160,7 +159,6 @@ class Window {
           const newWidth = initialWidth + (e.clientX - initialX);
           const newHeight = initialHeight + (e.clientY - initialY);
 
-          // Enforce minimum width and height
           if (newWidth >= this.options.minWidth) {
             windowElement.style.width = `${newWidth}px`;
           }
@@ -324,7 +322,7 @@ document.addEventListener("DOMContentLoaded", () => {
     height: 480,
     left: 150,
     top: 500,
-    resizable: false, // Explicitly disable resizing
+    resizable: false,
     isExternal: true,
 });
 
