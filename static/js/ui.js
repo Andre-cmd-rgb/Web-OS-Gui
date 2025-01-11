@@ -375,5 +375,5 @@ document.addEventListener("DOMContentLoaded", () => {
   
     loadWallpaperRecursively(1);
   }
-loadWallpapers(10);
+loadWallpapers(9);
 });
