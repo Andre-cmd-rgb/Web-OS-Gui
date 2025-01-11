@@ -285,8 +285,8 @@ document.addEventListener("DOMContentLoaded", () => {
   new Window("Terminal", "https://andre-cmd-rgb.github.io/Web-OS/", "app-icons/terminal.png", {
     width: 800, // Specify the desired width
     height: 600, // Specify the desired height
-    left: 100, // Optional positioning
-    top: 50,   // Optional positioning
+    left: 1000, // Optional positioning
+    top: 500,   // Optional positioning
     isExternal: true,
   });
   
@@ -294,7 +294,7 @@ document.addEventListener("DOMContentLoaded", () => {
     width: 320,
     height: 450,
     left: 150,
-    top: 100,
+    top: 500,
     isExternal: true,
   });
 
@@ -308,35 +308,11 @@ document.addEventListener("DOMContentLoaded", () => {
   new Window("Change Background", backgroundAppContent, "app-icons/theme.png", {
     width: 400,
     height: 300,
-    left: 200,
+    left: 800,
     top: 150,
   });
 
-  setTimeout(() => {
-    notificationManager.createNotification(
-      "Example App",
-      "Your process completed successfully!",
-      "success"
-    );
-  }, 2000);
-
-  setTimeout(() => {
-    notificationManager.createNotification(
-      "Example App",
-      "Warning: Low disk space detected.",
-      "warning",
-      7000
-    );
-  }, 5000);
-
-  setTimeout(() => {
-    notificationManager.createNotification(
-      "Example App",
-      "Failed to connect to the server.",
-      "error",
-      0
-    );
-  }, 8000);
+  
 
   function changeBackground(imagePath) {
     const desktop = document.getElementById("desktop");
@@ -346,7 +322,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function loadWallpapers() {
-    const wallpapers = ['wallpaper-1.png', 'wallpaper-2.png', 'wallpaper-3.jpg'];
+    const wallpapers = ['wallpaper-1.png', 'wallpaper-2.png'];
     const backgroundListDiv = document.querySelector('.background-list');
 
     wallpapers.forEach(wallpaper => {
@@ -360,6 +336,5 @@ document.addEventListener("DOMContentLoaded", () => {
       backgroundListDiv.appendChild(previewImage);
     });
   }
-
   loadWallpapers();
 });
