@@ -1,3 +1,4 @@
+// i will comment this file(when i have time)
 class Window {
   constructor(title, content, iconPath = "app-icons/app.png", options = {}) {
       this.title = title;
@@ -283,10 +284,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   new Window("My App", "Welcome to the app!", "app-icons/app.png");
   new Window("Terminal", "https://andre-cmd-rgb.github.io/Web-OS/", "app-icons/terminal.png", {
-    width: 800, // Specify the desired width
-    height: 600, // Specify the desired height
-    left: 1000, // Optional positioning
-    top: 500,   // Optional positioning
+    width: 800,
+    height: 600,
+    left: 1000,
+    top: 500,
     isExternal: true,
   });
   
