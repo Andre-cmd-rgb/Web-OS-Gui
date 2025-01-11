@@ -59,11 +59,14 @@ body {
   overflow: hidden;
   top: 50px;
   left: 50px;
-  resize: both; /* Allow resizing from the borders */
-  overflow: auto; /* Ensure content scrolls if necessary */
   backdrop-filter: blur(10px); /* Apply blur effect */
 }
 
+/* Only apply resize if the window is resizable */
+.window.resizable {
+  resize: both; /* Allow resizing from the borders */
+  overflow: auto; /* Ensure content scrolls if necessary */
+}
 
 /* Window header styling */
 .window-header {
@@ -134,7 +137,6 @@ body {
 .window-content iframe {
   scrolling: no; /* Disable scrolling */
 }
-
 
 /* Taskbar styles (centered, transparent, rounded) */
 #taskbar {

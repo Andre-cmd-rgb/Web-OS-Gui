@@ -1,194 +1,220 @@
 // i will comment this file(when i have time)
 class Window {
   constructor(title, content, iconPath = "app-icons/app.png", options = {}) {
-      this.title = title;
-      this.content = content;
-      this.iconPath = iconPath;
-      this.isMinimized = false;
-      this.taskbarItem = null;
+    this.title = title;
+    this.content = content;
+    this.iconPath = iconPath;
+    this.isMinimized = false;
+    this.taskbarItem = null;
 
-      this.options = {
-          width: options.width || 300,
-          height: options.height || 200,
-          left: options.left || 100,
-          top: options.top || 100,
-          resizable: options.resizable !== false,
-          draggable: options.draggable !== false,
-          isExternal: options.isExternal || false,
-      };
+    this.options = {
+      width: options.width || 300,
+      height: options.height || 200,
+      minWidth: options.minWidth || 150,   // Default minimum width
+      minHeight: options.minHeight || 100, // Default minimum height
+      left: options.left || 100,
+      top: options.top || 100,
+      resizable: options.resizable !== false,
+      draggable: options.draggable !== false,
+      isExternal: options.isExternal || false,
+    };
 
-      this.createWindow();
+    this.createWindow();
   }
 
   createWindow() {
-      const desktop = document.getElementById("desktop");
-      if (!desktop) {
-          console.error("Desktop container not found");
-          return;
-      }
+    const desktop = document.getElementById("desktop");
+    if (!desktop) {
+      console.error("Desktop container not found");
+      return;
+    }
 
-      const windowDiv = document.createElement("div");
-      windowDiv.classList.add("window");
-      windowDiv.id = `window-${this.title}`;
-      windowDiv.style.position = "absolute";
-      windowDiv.style.left = `${this.options.left}px`;
-      windowDiv.style.top = `${this.options.top}px`;
-      windowDiv.style.width = `${this.options.width}px`;
-      windowDiv.style.height = `${this.options.height}px`;
+    const windowDiv = document.createElement("div");
+    windowDiv.classList.add("window");
+    windowDiv.id = `window-${this.title}`;
+    windowDiv.style.position = "absolute";
+    windowDiv.style.left = `${this.options.left}px`;
+    windowDiv.style.top = `${this.options.top}px`;
+    windowDiv.style.width = `${this.options.width}px`;
+    windowDiv.style.height = `${this.options.height}px`;
+    windowDiv.style.minWidth = `${this.options.minWidth}px`;   // Apply minimum width
+    windowDiv.style.minHeight = `${this.options.minHeight}px`; // Apply minimum height
 
-      const header = document.createElement("div");
-      header.classList.add("window-header");
-      header.innerHTML = `
-        <span>${this.title}</span>
-        <div class="window-btns">
-          <button class="window-btn close"></button>
-          <button class="window-btn maximize"></button>
-          <button class="window-btn minimize"></button>
-        </div>
-      `;
+    // Add resizable class only if the window is resizable
+    if (this.options.resizable) {
+      windowDiv.classList.add("resizable");
+    }
 
-      header.querySelector(".close").addEventListener("click", () => this.closeWindow(windowDiv));
+    const header = document.createElement("div");
+    header.classList.add("window-header");
+    header.innerHTML = `
+      <span>${this.title}</span>
+      <div class="window-btns">
+        <button class="window-btn close"></button>
+        ${this.options.resizable ? '<button class="window-btn maximize"></button>' : ''}
+        <button class="window-btn minimize"></button>
+      </div>
+    `;
+
+    header.querySelector(".close").addEventListener("click", () => this.closeWindow(windowDiv));
+    if (this.options.resizable) {
       header.querySelector(".maximize").addEventListener("click", () => this.toggleMaximize(windowDiv));
-      header.querySelector(".minimize").addEventListener("click", () => this.minimizeWindow(windowDiv));
+    }
+    header.querySelector(".minimize").addEventListener("click", () => this.minimizeWindow(windowDiv));
 
-      const contentDiv = document.createElement("div");
-      contentDiv.classList.add("window-content");
-      if (this.options.isExternal || this.isURL(this.content)) {
-          const iframe = document.createElement("iframe");
-          iframe.src = this.content;
-          iframe.style.width = "100%";
-          iframe.style.height = "100%";
-          iframe.style.border = "none";
-          contentDiv.appendChild(iframe);
-      } else {
-          contentDiv.innerHTML = this.content;
-      }
+    const contentDiv = document.createElement("div");
+    contentDiv.classList.add("window-content");
+    if (this.options.isExternal || this.isURL(this.content)) {
+      const iframe = document.createElement("iframe");
+      iframe.src = this.content;
+      iframe.style.width = "100%";
+      iframe.style.height = "100%";
+      iframe.style.border = "none";
+      contentDiv.appendChild(iframe);
+    } else {
+      contentDiv.innerHTML = this.content;
+    }
 
-      windowDiv.appendChild(header);
-      windowDiv.appendChild(contentDiv);
+    windowDiv.appendChild(header);
+    windowDiv.appendChild(contentDiv);
 
-      if (this.options.resizable) {
-          const resizeHandle = document.createElement("div");
-          resizeHandle.classList.add("resize-handle");
-          windowDiv.appendChild(resizeHandle);
-          this.makeWindowResizable(windowDiv, resizeHandle);
-      }
+    if (this.options.draggable) {
+      this.makeWindowDraggable(windowDiv);
+    }
 
-      desktop.appendChild(windowDiv);
+    if (this.options.resizable) {
+      this.makeWindowResizable(windowDiv);
+    }
 
-      if (this.options.draggable) {
-          this.makeWindowDraggable(windowDiv);
-      }
-
-      this.addToTaskbar();
-  }
-
-  isURL(str) {
-      const pattern = /^(https?:\/\/[^\s$.?#].[^\s]*)$/;
-      return pattern.test(str);
-  }
-
-  addToTaskbar() {
-      const taskbar = document.getElementById("taskbar");
-      if (!taskbar) {
-          console.error("Taskbar not found");
-          return;
-      }
-
-      this.taskbarItem = document.createElement("div");
-      this.taskbarItem.classList.add("taskbar-item");
-      this.taskbarItem.id = `taskbar-${this.title}`;
-      this.taskbarItem.innerHTML = `<img src="${this.iconPath}" alt="${this.title} Icon">`;
-      this.taskbarItem.onclick = () => this.restoreWindow();
-      taskbar.appendChild(this.taskbarItem);
-  }
-
-  restoreWindow() {
-      const windowElement = document.getElementById(`window-${this.title}`);
-      if (windowElement) {
-          windowElement.style.display = "block";
-          this.isMinimized = false;
-      }
-
-      if (this.taskbarItem) {
-          this.taskbarItem.remove();
-          this.taskbarItem = null;
-      }
-
-      this.addToTaskbar();
-  }
-
-  minimizeWindow(windowElement) {
-      windowElement.style.display = "none";
-      this.isMinimized = true;
-
-      if (!this.taskbarItem) {
-          this.addToTaskbar();
-      }
-  }
-
-  closeWindow(windowElement) {
-      windowElement.remove();
-      if (this.taskbarItem) {
-          this.taskbarItem.remove();
-      }
+    desktop.appendChild(windowDiv);
+    this.addToTaskbar();
   }
 
   toggleMaximize(windowElement) {
-      if (windowElement.style.width === "100%") {
-          windowElement.style.width = `${this.options.width}px`;
-          windowElement.style.height = `${this.options.height}px`;
-      } else {
-          windowElement.style.width = "100%";
-          windowElement.style.height = "100%";
-          windowElement.style.left = "0";
-          windowElement.style.top = "0";
-      }
+    if (!this.options.resizable) return; // Prevent maximizing if not resizable
+
+    if (windowElement.style.width === "100%") {
+      windowElement.style.width = `${this.options.width}px`;
+      windowElement.style.height = `${this.options.height}px`;
+      windowElement.style.left = `${this.options.left}px`;
+      windowElement.style.top = `${this.options.top}px`;
+    } else {
+      windowElement.style.width = "100%";
+      windowElement.style.height = "100%";
+      windowElement.style.left = "0";
+      windowElement.style.top = "0";
+    }
+  }
+
+  minimizeWindow(windowElement) {
+    windowElement.style.display = "none";
+    this.isMinimized = true;
+
+    if (!this.taskbarItem) {
+      this.addToTaskbar();
+    }
+  }
+
+  closeWindow(windowElement) {
+    windowElement.remove();
+    if (this.taskbarItem) {
+      this.taskbarItem.remove();
+    }
   }
 
   makeWindowDraggable(windowElement) {
-      let offsetX, offsetY;
-      windowElement.querySelector(".window-header").onmousedown = (e) => {
-          offsetX = e.clientX - windowElement.offsetLeft;
-          offsetY = e.clientY - windowElement.offsetTop;
+    let offsetX, offsetY;
+    windowElement.querySelector(".window-header").onmousedown = (e) => {
+      offsetX = e.clientX - windowElement.offsetLeft;
+      offsetY = e.clientY - windowElement.offsetTop;
 
-          document.onmousemove = (e) => {
-              windowElement.style.left = `${e.clientX - offsetX}px`;
-              windowElement.style.top = `${e.clientY - offsetY}px`;
-          };
-
-          document.onmouseup = () => {
-              document.onmousemove = null;
-              document.onmouseup = null;
-          };
+      document.onmousemove = (e) => {
+        windowElement.style.left = `${e.clientX - offsetX}px`;
+        windowElement.style.top = `${e.clientY - offsetY}px`;
       };
+
+      document.onmouseup = () => {
+        document.onmousemove = null;
+        document.onmouseup = null;
+      };
+    };
   }
 
-  makeWindowResizable(windowElement, resizeHandle) {
-      let isResizing = false;
+  makeWindowResizable(windowElement) {
+    if (!this.options.resizable) return; // Don't create the resize handle if not resizable
 
-      resizeHandle.onmousedown = (e) => {
-          isResizing = true;
-          const initialWidth = windowElement.offsetWidth;
-          const initialHeight = windowElement.offsetHeight;
-          const initialX = e.clientX;
-          const initialY = e.clientY;
+    let isResizing = false;
+    const resizeHandle = document.createElement("div");
+    resizeHandle.classList.add("resize-handle");
+    windowElement.appendChild(resizeHandle);
 
-          document.onmousemove = (e) => {
-              if (isResizing) {
-                  windowElement.style.width = `${initialWidth + (e.clientX - initialX)}px`;
-                  windowElement.style.height = `${initialHeight + (e.clientY - initialY)}px`;
-              }
-          };
+    resizeHandle.onmousedown = (e) => {
+      isResizing = true;
+      const initialWidth = windowElement.offsetWidth;
+      const initialHeight = windowElement.offsetHeight;
+      const initialX = e.clientX;
+      const initialY = e.clientY;
 
-          document.onmouseup = () => {
-              isResizing = false;
-              document.onmousemove = null;
-              document.onmouseup = null;
-          };
+      document.onmousemove = (e) => {
+        if (isResizing) {
+          const newWidth = initialWidth + (e.clientX - initialX);
+          const newHeight = initialHeight + (e.clientY - initialY);
+
+          // Enforce minimum width and height
+          if (newWidth >= this.options.minWidth) {
+            windowElement.style.width = `${newWidth}px`;
+          }
+          if (newHeight >= this.options.minHeight) {
+            windowElement.style.height = `${newHeight}px`;
+          }
+        }
       };
+
+      document.onmouseup = () => {
+        isResizing = false;
+        document.onmousemove = null;
+        document.onmouseup = null;
+      };
+    };
+  }
+
+  isURL(str) {
+    const pattern = /^(https?:\/\/[^\s$.?#].[^\s]*)$/;
+    return pattern.test(str);
+  }
+
+  addToTaskbar() {
+    const taskbar = document.getElementById("taskbar");
+    if (!taskbar) {
+      console.error("Taskbar not found");
+      return;
+    }
+
+    this.taskbarItem = document.createElement("div");
+    this.taskbarItem.classList.add("taskbar-item");
+    this.taskbarItem.id = `taskbar-${this.title}`;
+    this.taskbarItem.innerHTML = `<img src="${this.iconPath}" alt="${this.title} Icon">`;
+    this.taskbarItem.onclick = () => this.restoreWindow();
+    taskbar.appendChild(this.taskbarItem);
+  }
+
+  restoreWindow() {
+    const windowElement = document.getElementById(`window-${this.title}`);
+    if (windowElement) {
+      windowElement.style.display = "block";
+      this.isMinimized = false;
+    }
+
+    if (this.taskbarItem) {
+      this.taskbarItem.remove();
+      this.taskbarItem = null;
+    }
+
+    this.addToTaskbar();
   }
 }
+
+
 
 class NotificationManager {
   constructor() {
@@ -288,16 +314,20 @@ document.addEventListener("DOMContentLoaded", () => {
     height: 600,
     left: 1000,
     top: 500,
+    minWidth: 400,
+    minHeight: 300,
     isExternal: true,
   });
   
-  new Window("Calculator", "apps/calc.html", "app-icons/app.png", {
-    width: 320,
-    height: 450,
+  new Window("Calculator", "apps/calc.html", "app-icons/calculator.png", {
+    width: 350,
+    height: 480,
     left: 150,
     top: 500,
+    resizable: false, // Explicitly disable resizing
     isExternal: true,
-  });
+});
+
 
   const backgroundAppContent = `
     <div class="background-app">
@@ -307,10 +337,12 @@ document.addEventListener("DOMContentLoaded", () => {
   `;
 
   new Window("Change Background", backgroundAppContent, "app-icons/theme.png", {
-    width: 400,
-    height: 300,
+    width: 420,
+    height: 360,
     left: 800,
     top: 150,
+    minWidth: 420,
+    minHeight: 360,
   });
 
   
@@ -322,11 +354,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function loadWallpapers() {
-    const wallpapers = ['wallpaper-1.png', 'wallpaper-2.png'];
+  function loadWallpapers(numWallpapers) {
     const backgroundListDiv = document.querySelector('.background-list');
-
-    wallpapers.forEach(wallpaper => {
+  
+    function loadWallpaperRecursively(index) {
+      if (index > numWallpapers) return;
+  
+      const wallpaper = `wallpaper-${index}.png`;
       const previewImage = document.createElement("img");
       previewImage.src = `wallpapers/${wallpaper}`;
       previewImage.alt = wallpaper;
@@ -335,7 +369,11 @@ document.addEventListener("DOMContentLoaded", () => {
       previewImage.style.margin = '10px';
       previewImage.onclick = () => changeBackground(`wallpapers/${wallpaper}`);
       backgroundListDiv.appendChild(previewImage);
-    });
+  
+      loadWallpaperRecursively(index + 1);
+    }
+  
+    loadWallpaperRecursively(1);
   }
-  loadWallpapers();
+loadWallpapers(9);
 });
