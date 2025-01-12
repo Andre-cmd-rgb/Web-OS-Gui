@@ -26,53 +26,67 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 
-  const backgroundAppContent = `
-    <div class="background-app">
-      <h3>Select a Background</h3>
-      <div class="background-list" style="display: flex; flex-wrap: wrap; padding: 10px;"></div>
-    </div>
-  `;
+const backgroundAppContent = `
+<div class="background-app">
+  <h3>Select a Background</h3>
+  <div class="background-list" style="display: flex; flex-wrap: wrap; padding: 10px;"></div>
+</div>
+`;
 
-  new Window("Change Background", backgroundAppContent, "app-icons/theme.png", {
-    width: 420,
-    height: 360,
-    left: 800,
-    top: 150,
-    minWidth: 420,
-    minHeight: 360,
-  });
+new Window("Change Background", backgroundAppContent, "app-icons/theme.png", {
+width: 420,
+height: 360,
+left: 800,
+top: 150,
+minWidth: 420,
+minHeight: 360,
+});
 
-  
 
-  function changeBackground(imagePath) {
-    const desktop = document.getElementById("desktop");
-    if (desktop) {
-      desktop.style.backgroundImage = `url('${imagePath}')`;
-    }
-  }
+function changeBackground(imagePath) {
+const desktop = document.getElementById("desktop");
+if (desktop) {
+  desktop.style.backgroundImage = `url('${imagePath}')`;
+  localStorage.setItem("currentWallpaper", imagePath);
+}
+}
 
-  function loadWallpapers(numWallpapers) {
-    const backgroundListDiv = document.querySelector('.background-list');
-  
-    function loadWallpaperRecursively(index) {
-      if (index > numWallpapers) return;
-  
-      const wallpaper = `wallpaper-${index}.png`;
-      const previewImage = document.createElement("img");
-      previewImage.src = `wallpapers/${wallpaper}`;
-      previewImage.alt = wallpaper;
-      previewImage.style.width = '100px';
-      previewImage.style.height = 'auto';
-      previewImage.style.margin = '10px';
-      previewImage.onclick = () => changeBackground(`wallpapers/${wallpaper}`);
-      backgroundListDiv.appendChild(previewImage);
-  
-      loadWallpaperRecursively(index + 1);
-    }
-  
-    loadWallpaperRecursively(1);
-  }
+
+function loadWallpapers(numWallpapers) {
+const backgroundListDiv = document.querySelector('.background-list');
+
+function loadWallpaperRecursively(index) {
+  if (index > numWallpapers) return;
+
+  const wallpaper = `wallpaper-${index}.png`;
+  const previewImage = document.createElement("img");
+  previewImage.src = `wallpapers/${wallpaper}`;
+  previewImage.alt = wallpaper;
+  previewImage.style.width = '100px';
+  previewImage.style.height = 'auto';
+  previewImage.style.margin = '10px';
+  previewImage.onclick = () => changeBackground(`wallpapers/${wallpaper}`);
+  backgroundListDiv.appendChild(previewImage);
+
+  loadWallpaperRecursively(index + 1);
+}
+
+loadWallpaperRecursively(1);
+}
+
 loadWallpapers(9);
+
+function loadSavedWallpaper() {
+const savedWallpaper = localStorage.getItem("currentWallpaper");
+if (savedWallpaper) {
+  changeBackground(savedWallpaper);
+} else {
+  changeBackground("wallpapers/wallpaper-2.png");
+}
+}
+
+loadSavedWallpaper();
+
 });
 
 function setupTopbar() {
