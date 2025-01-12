@@ -102,19 +102,16 @@
 
     <script type="module" src="../js/fs.js"></script>
     <script type="module">
-    import FileSystem from '../js/fs.js';  // Import FileSystem class as a module
+    import FileSystem from '../js/fs.js';
 
     const fs = new FileSystem();
 
-    // Default to root directory on load
     document.getElementById("pathInput").value = "root";
     
-    // Handle the button click to create a directory
     document.getElementById("createDirBtn").onclick = async () => {
         const path = document.getElementById("pathInput").value;
         try {
             await fs.createDirectory(path);
-
             displayMessage(`Directory '${path}' created.`, "success");
         } catch (error) {
             displayMessage(`Error: ${error.message}`, "message");
@@ -184,8 +181,6 @@
             outputDiv.classList.add("message");
             outputDiv.classList.remove("success");
         }
-
-        // Clear input fields after successful action
         if (type === "success") {
             document.getElementById("pathInput").value = "root";
             document.getElementById("fileContent").value = "";
