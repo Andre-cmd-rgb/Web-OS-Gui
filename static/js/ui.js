@@ -307,8 +307,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const notificationManager = new NotificationManager();
 
   new Window("My App", "Welcome to the app!", "app-icons/app.png");
-  new Window("Terminal", "https://andre-cmd-rgb.github.io/Web-OS/", "app-icons/terminal.png", {
-    width: 800,
+  new Window("Terminal", "apps/terminal.html", "app-icons/terminal.png", {
+    width: 1000,
     height: 600,
     left: 1000,
     top: 500,
