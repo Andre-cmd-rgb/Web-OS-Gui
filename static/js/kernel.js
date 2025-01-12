@@ -86,6 +86,15 @@ if (savedWallpaper) {
 }
 
 loadSavedWallpaper();
+new Window("File System", "apps/fs.html", "app-icons/app.png", {
+  width: 420,
+  height: 480,
+  left: 600,
+  top: 100,
+  minWidth: 420,
+  minHeight: 480,
+  isExternal: true,
+});
 
 });
 
