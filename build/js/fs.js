@@ -5,8 +5,8 @@ class FileSystem {
     this.db = null; // Store the reference to the DB
   }
 
+  // Initialize the IndexedDB database
   async init() {
-    // Check if the database is already open
     if (this.db) {
       return this.db; // If already initialized, return the existing db
     }
@@ -28,6 +28,7 @@ class FileSystem {
     return this.db;
   }
 
+  // Perform a transaction on the store
   async performTransaction(storeName, operation, mode = "readonly") {
     if (!this.db) {
       await this.init(); // Ensure DB is initialized
@@ -43,9 +44,10 @@ class FileSystem {
     });
   }
 
+  // Create a new directory
   async createDirectory(path) {
     if (path.startsWith("/")) {
-      path = path.slice(1); 
+      path = path.slice(1); // Remove leading slash if any
     }
 
     const existingEntry = await this.performTransaction(this.storeName, (store) => store.get(path));
@@ -55,8 +57,41 @@ class FileSystem {
 
     const entry = { path, type: "directory", contents: [] };
     await this.performTransaction(this.storeName, (store) => store.add(entry), "readwrite");
+
+    // Update parent directory after creation
+    await this._updateParentDirectory(path);
   }
 
+  // Check if the path already exists in the file system
+  async _checkIfPathExists(path) {
+    const entry = await this.performTransaction(this.storeName, (store) => store.get(path));
+    return entry !== undefined;
+  }
+
+  // Update parent directory by adding the new path to its contents
+  async _updateParentDirectory(filePath) {
+    const parentPath = this._getParentDirectory(filePath);
+    const parentDir = await this.performTransaction(this.storeName, (store) => store.get(parentPath));
+
+    if (parentDir && parentDir.type === "directory") {
+      if (!parentDir.contents.includes(filePath)) {
+        parentDir.contents.push(filePath);
+        await this.performTransaction(this.storeName, (store) => store.put(parentDir), "readwrite");
+      }
+    } else {
+      throw new Error("Parent directory not found or is not a directory");
+    }
+  }
+
+  // Helper to get the parent directory path from the current path
+  _getParentDirectory(path) {
+    const parts = path.split("/");
+    parts.pop(); // Remove the file or directory name
+    return parts.join("/") || "/";  // "/" if at the root
+  }
+
+  // Additional file operations (create file, write, read, delete, etc.)
+  // Create a new file (for demonstration purposes)
   async createFile(path, data) {
     if (path.startsWith("/")) {
       path = path.slice(1);
@@ -81,24 +116,7 @@ class FileSystem {
     await this.performTransaction(this.storeName, (store) => store.add(entry), "readwrite");
   }
 
-  async writeFile(path, data) {
-    const entry = await this.performTransaction(this.storeName, (store) => store.get(path));
-    if (!entry || entry.type !== "file") {
-      throw new Error("File not found");
-    }
-
-    entry.content = data;
-    await this.performTransaction(this.storeName, (store) => store.put(entry), "readwrite");
-  }
-
-  async readFile(path) {
-    const entry = await this.performTransaction(this.storeName, (store) => store.get(path));
-    if (!entry || entry.type !== "file") {
-      throw new Error("File not found");
-    }
-    return entry.content;
-  }
-
+  // List contents of a directory
   async listContents(path) {
     const directory = await this.performTransaction(this.storeName, (store) => store.get(path));
     if (!directory || directory.type !== "directory") {
@@ -107,6 +125,7 @@ class FileSystem {
     return directory.contents || [];
   }
 
+  // Delete a directory or file
   async deleteEntry(path) {
     const entry = await this.performTransaction(this.storeName, (store) => store.get(path));
     if (!entry) {
@@ -132,13 +151,6 @@ class FileSystem {
         }
       }
     }
-  }
-
-  // get parent dir from a given path
-  _getParentDirectory(path) {
-    const parts = path.split("/");
-    parts.pop(); // delete/remove the file/directory name
-    return parts.join("/") || "/";  // "/" if at the root
   }
 }
 

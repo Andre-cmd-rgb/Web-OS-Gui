@@ -107,17 +107,20 @@
     const fs = new FileSystem();
 
     // Default to root directory on load
-    document.getElementById("pathInput").value = "/";
-
+    document.getElementById("pathInput").value = "root";
+    
+    // Handle the button click to create a directory
     document.getElementById("createDirBtn").onclick = async () => {
         const path = document.getElementById("pathInput").value;
         try {
             await fs.createDirectory(path);
-            displayMessage(`Directory created at: ${path}`, "success");
+
+            displayMessage(`Directory '${path}' created.`, "success");
         } catch (error) {
             displayMessage(`Error: ${error.message}`, "message");
         }
     };
+
 
     document.getElementById("createFileBtn").onclick = async () => {
         const path = document.getElementById("pathInput").value;
@@ -184,7 +187,7 @@
 
         // Clear input fields after successful action
         if (type === "success") {
-            document.getElementById("pathInput").value = "/";
+            document.getElementById("pathInput").value = "root";
             document.getElementById("fileContent").value = "";
         }
     }
