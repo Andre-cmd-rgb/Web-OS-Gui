@@ -86,7 +86,7 @@ if (savedWallpaper) {
 }
 
 loadSavedWallpaper();
-new Window("File System", "apps/fs.html", "app-icons/app.png", {
+new Window("Web Edit", "apps/editor.html", "app-icons/editor.png", {
   width: 420,
   height: 480,
   left: 600,

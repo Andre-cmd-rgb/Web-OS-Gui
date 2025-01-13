@@ -90,8 +90,27 @@ class FileSystem {
     return parts.join("/") || "/";  // "/" if at the root
   }
 
-  // Additional file operations (create file, write, read, delete, etc.)
-  // Create a new file (for demonstration purposes)
+  // Save or update a file
+  async writeFile(path, data) {
+    if (path.startsWith("/")) {
+      path = path.slice(1); // Remove leading slash if any
+    }
+
+    const existingEntry = await this.performTransaction(this.storeName, (store) => store.get(path));
+
+    if (existingEntry) {
+      if (existingEntry.type !== "file") {
+        throw new Error("Cannot save: The specified path is not a file");
+      }
+      // Update existing file content
+      existingEntry.content = data;
+      await this.performTransaction(this.storeName, (store) => store.put(existingEntry), "readwrite");
+    } else {
+      // Create a new file if it doesn't exist
+      await this.createFile(path, data);
+    }
+  }
+
   async createFile(path, data) {
     if (path.startsWith("/")) {
       path = path.slice(1);
@@ -123,6 +142,24 @@ class FileSystem {
       throw new Error("Directory not found");
     }
     return directory.contents || [];
+  }
+  // Read the contents of a file
+  async readFile(path) {
+    if (path.startsWith("/")) {
+      path = path.slice(1); // Remove leading slash if any
+    }
+
+    const entry = await this.performTransaction(this.storeName, (store) => store.get(path));
+
+    if (!entry) {
+      throw new Error("File not found");
+    }
+
+    if (entry.type !== "file") {
+      throw new Error("The specified path is not a file");
+    }
+
+    return entry.content; // Return the file's content
   }
 
   // Delete a directory or file

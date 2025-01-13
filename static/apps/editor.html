@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web OS</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.9/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.9/theme/dracula.min.css">
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #1e1e2f;
+      color: white;
+    }
+
+    #sidebar {
+      width: 250px;
+      background-color: rgba(45, 45, 45, 0.9);
+      overflow-y: auto;
+      padding: 10px;
+      border-right: 1px solid #444;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+    }
+
+    #editor-container {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #editor-header {
+      background-color: rgba(30, 30, 30, 0.8);
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #444;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+    }
+
+    .tab {
+      background-color: #444;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      background-color: #007acc;
+    }
+
+    .file-item {
+      cursor: pointer;
+      padding: 5px;
+      margin: 2px 0;
+      border-radius: 5px;
+    }
+
+    .file-item:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .file-item.directory {
+      font-weight: bold;
+    }
+
+    #editor {
+      flex-grow: 1;
+      height: 100%;
+    }
+
+    #terminal {
+      height: 200px;
+      background-color: black;
+      color: white;
+      padding: 10px;
+      overflow-y: auto;
+      font-size: 12px;
+    }
+
+    button {
+      background-color: #007acc;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #005fa3;
+    }
+  </style>
+</head>
+<body>
+  <div id="sidebar">
+    <h3>File Explorer</h3>
+    <div id="file-list"></div>
+    <button id="newDirBtn">New Directory</button>
+    <button id="newFileBtn">New File</button>
+  </div>
+  <div id="editor-container">
+    <div id="editor-header">
+      <div class="tabs" id="editor-tabs"></div>
+      <button id="saveFileBtn">Save File</button>
+    </div>
+    <div id="editor"></div>
+    <div id="terminal"></div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.9/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.9/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.9/mode/htmlmixed/htmlmixed.min.js"></script>
+  <script type="module">
+    import FileSystem from '../js/fs.js';
+
+    const fs = new FileSystem();
+    let currentFilePath = null;
+
+    const editor = CodeMirror(document.getElementById('editor'), {
+      mode: 'javascript',
+      lineNumbers: true,
+      theme: 'dracula',
+      tabSize: 4,
+      indentWithTabs: true,
+    });
+
+    const terminal = document.getElementById('terminal');
+    const fileList = document.getElementById('file-list');
+    const tabsContainer = document.getElementById('editor-tabs');
+
+    async function listDirectory(path) {
+      console.log(`Listing directory: ${path}`);
+      fileList.innerHTML = '';
+
+      try {
+        const contents = await fs.listContents(path);
+
+        contents.forEach(item => {
+          const fullPath = item.startsWith(path) ? item : `${path}/${item}`.replace(/\/+/g, '/');
+          const itemElement = document.createElement('div');
+          itemElement.className = 'file-item';
+          itemElement.textContent = item.replace(`${path}/`, '');
+
+          if (item.endsWith('/')) {
+            itemElement.classList.add('directory');
+            itemElement.addEventListener('click', () => listDirectory(fullPath));
+          } else {
+            itemElement.addEventListener('click', () => openFile(fullPath));
+          }
+
+          fileList.appendChild(itemElement);
+        });
+      } catch (error) {
+        console.error(`Error listing directory ${path}: ${error.message}`);
+      }
+    }
+
+    async function openFile(path) {
+      console.log(`Opening file: ${path}`);
+      try {
+        const content = await fs.readFile(path);
+        editor.setValue(content);
+        currentFilePath = path;
+        updateTabs(path);
+      } catch (error) {
+        console.error(`Error opening file ${path}: ${error.message}`);
+      }
+    }
+
+    function updateTabs(path) {
+      if (!Array.from(tabsContainer.children).some(tab => tab.textContent === path.split('/').pop())) {
+        const tab = document.createElement('div');
+        tab.className = 'tab';
+        tab.textContent = path.split('/').pop();
+        tab.addEventListener('click', () => openFile(path));
+        tabsContainer.appendChild(tab);
+      }
+    }
+
+    document.getElementById('newFileBtn').addEventListener('click', async () => {
+      const fileName = prompt('Enter file name:');
+      if (fileName) {
+        const path = `root/${fileName}`;
+        try {
+          await fs.createFile(path, '');
+          listDirectory('root');
+        } catch (error) {
+          console.error(`Error creating file ${path}: ${error.message}`);
+        }
+      }
+    });
+
+    document.getElementById('newDirBtn').addEventListener('click', async () => {
+      const dirName = prompt('Enter directory name:');
+      if (dirName) {
+        const path = `root/${dirName}/`;
+        try {
+          await fs.createDirectory(path);
+          listDirectory('root');
+        } catch (error) {
+          console.error(`Error creating directory ${path}: ${error.message}`);
+        }
+      }
+    });
+
+    document.getElementById('saveFileBtn').addEventListener('click', async () => {
+      if (currentFilePath) {
+        try {
+          await fs.writeFile(currentFilePath, editor.getValue());
+          console.log(`File saved: ${currentFilePath}`);
+        } catch (error) {
+          console.error(`Error saving file ${currentFilePath}: ${error.message}`);
+        }
+      } else {
+        alert('No file selected.');
+      }
+    });
+
+    listDirectory('root');
+  </script>
+</body>
+</html>

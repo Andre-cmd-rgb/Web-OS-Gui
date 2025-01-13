@@ -33,7 +33,7 @@ export const commands = {
       async run(terminal, args) {
         if (args.length < 1) throw new Error("Usage: run [file]");
         const filePath = terminal._getFullPath(args[0]);
-        terminal.print(`Trying to run file at path: ${filePath}`); // Debugging line
+        terminal.print(`Trying to run file at path: ${filePath}`);
         const fileExists = await terminal._checkIfPathExists(filePath);
         if (!fileExists) {
           terminal.print(`Error: File '${filePath}' not found.`);
