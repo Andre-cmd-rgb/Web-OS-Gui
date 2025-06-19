@@ -1,6 +1,6 @@
 # Web OS Gui💻
 
-A basic working operating system implemented in JavaScript. This project to create a gui-based OS, where users can interact with a file system, execute commands, and manage directories and files through the web interface. 🚀
+A basic working operating system implemented in JavaScript. It has a file system clone command to clone git repos a calculator a text editor and a cool wallpaper app.
 
 # Screenshots 📸
 
