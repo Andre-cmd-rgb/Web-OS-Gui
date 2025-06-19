@@ -1,0 +1,29 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: black;
+    color: lime;
+    font-family: monospace;
+    font-size: 16px;
+  }
+  
+  #terminal {
+    padding: 10px;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  
+  #input-line {
+    outline: none;
+    display: inline;
+    caret-color: lime;
+  }
+  
+  .prompt-line {
+    display: flex;
+    align-items: baseline;
+  }
+  
+  #input-line:focus {
+    outline: none;
+  }

@@ -1,0 +1,178 @@
+/* Basic reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f0f0f5;
+  height: 100vh;
+  overflow: hidden;
+  font-size: 16px;
+}
+
+
+#desktop {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-image: url('../wallpapers/wallpaper-2.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow: hidden;
+  padding-bottom: 90px;
+}
+
+
+#desktop #topbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: #5c5c5c85;
+  backdrop-filter: blur(10px);
+  width: 100vw;
+  height: 1.2cm;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #c7c7c75c;
+}
+
+#desktop #topbar span {
+  background-color: #c7c7c75c;
+  border-radius: 10px;
+  padding: 5px 10px;
+}
+
+
+.window {
+  position: absolute;
+  width: 300px;
+  height: 200px;
+  background-color: rgba(13, 32, 35, 0.399);
+  border-radius: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  top: 50px;
+  left: 50px;
+  backdrop-filter: blur(10px);
+}
+
+
+.window.resizable {
+  resize: both; 
+  overflow: auto;
+}
+
+.window-header {
+  background-color: rgb(0, 0, 0);
+  color: rgb(92, 179, 245);
+  padding: 8px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  font-size: 14px;
+}
+
+
+.window-header span {
+  font-size: 14px;
+}
+
+
+.window-header .window-btns {
+  display: flex;
+  gap: 10px;
+}
+
+.window-header .window-btn {
+  width: 12px;
+  height: 12px;
+  background-color: #e74c3c;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+}
+
+.window-header .window-btn:hover {
+  opacity: 0.8;
+}
+
+.window-header .window-btn.maximize {
+  background-color: #f39c12;
+}
+
+.window-header .window-btn.minimize {
+  background-color: #2ecc71;
+}
+
+.window-header .window-btn.close {
+  background-color: #e74c3c;
+}
+
+
+.window-content {
+  padding: 0;
+  height: calc(100% - 40px);
+  overflow: hidden;
+}
+
+.window-content iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  overflow: hidden;
+  display: block;
+}
+
+.window-content iframe {
+  scrolling: no;
+}
+
+
+#taskbar {
+  position: fixed;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 25px;
+  padding: 5px 10px;
+}
+
+.taskbar-item {
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 5px;
+  cursor: pointer;
+}
+
+.taskbar-item:hover {
+  background-color: rgba(255, 255, 255, 0.6);
+}
+
+.taskbar-item img {
+  width: 24px;
+  height: 24px;
+}
+.taskbar-item-hidden {
+  opacity: 0.5;
+}
+
