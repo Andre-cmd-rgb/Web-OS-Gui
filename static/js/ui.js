@@ -1,4 +1,5 @@
 // i will comment this file(when i have time)
+// bruh nvm i let the ai do it
 class Window {
   constructor(title, content, iconPath = "app-icons/app.png", options = {}) {
     this.title = title;
