@@ -1,5 +1,3 @@
-// kernel.js
-
 document.addEventListener("DOMContentLoaded", function() {
   setupTopbar();
   showTime();
