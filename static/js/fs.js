@@ -2,13 +2,13 @@ class FileSystem {
   constructor() {
     this.dbName = "WebOSFileSystem";
     this.storeName = "FileSystemStore";
-    this.db = null; // Store the reference to the DB
+    this.db = null; // store to db
   }
 
-  // Initialize the IndexedDB database
+  // init db
   async init() {
     if (this.db) {
-      return this.db; // If already initialized, return the existing db
+      return this.db; // id init return the existing db
     }
 
     this.db = await new Promise((resolve, reject) => {
@@ -28,10 +28,10 @@ class FileSystem {
     return this.db;
   }
 
-  // Perform a transaction on the store
+  // transact
   async performTransaction(storeName, operation, mode = "readonly") {
     if (!this.db) {
-      await this.init(); // Ensure DB is initialized
+      await this.init(); //makes sure it's initialised
     }
 
     return new Promise((resolve, reject) => {
@@ -47,7 +47,7 @@ class FileSystem {
   // Create a new directory
   async createDirectory(path) {
     if (path.startsWith("/")) {
-      path = path.slice(1); // Remove leading slash if any
+      path = path.slice(1); // removes that damned /
     }
 
     const existingEntry = await this.performTransaction(this.storeName, (store) => store.get(path));
@@ -58,17 +58,17 @@ class FileSystem {
     const entry = { path, type: "directory", contents: [] };
     await this.performTransaction(this.storeName, (store) => store.add(entry), "readwrite");
 
-    // Update parent directory after creation
+    // update parent dir
     await this._updateParentDirectory(path);
   }
 
-  // Check if the path already exists in the file system
+  // sel explain
   async _checkIfPathExists(path) {
     const entry = await this.performTransaction(this.storeName, (store) => store.get(path));
     return entry !== undefined;
   }
 
-  // Update parent directory by adding the new path to its contents
+
   async _updateParentDirectory(filePath) {
     const parentPath = this._getParentDirectory(filePath);
     const parentDir = await this.performTransaction(this.storeName, (store) => store.get(parentPath));
@@ -90,10 +90,10 @@ class FileSystem {
     return parts.join("/") || "/";  // "/" if at the root
   }
 
-  // Save or update a file
+  // save or update file
   async writeFile(path, data) {
     if (path.startsWith("/")) {
-      path = path.slice(1); // Remove leading slash if any
+      path = path.slice(1); // that / again
     }
 
     const existingEntry = await this.performTransaction(this.storeName, (store) => store.get(path));
@@ -135,7 +135,7 @@ class FileSystem {
     await this.performTransaction(this.storeName, (store) => store.add(entry), "readwrite");
   }
 
-  // List contents of a directory
+  // ls
   async listContents(path) {
     const directory = await this.performTransaction(this.storeName, (store) => store.get(path));
     if (!directory || directory.type !== "directory") {
@@ -143,10 +143,10 @@ class FileSystem {
     }
     return directory.contents || [];
   }
-  // Read the contents of a file
+  // read
   async readFile(path) {
     if (path.startsWith("/")) {
-      path = path.slice(1); // Remove leading slash if any
+      path = path.slice(1); // rm -rf / obv joking
     }
 
     const entry = await this.performTransaction(this.storeName, (store) => store.get(path));
@@ -159,10 +159,10 @@ class FileSystem {
       throw new Error("The specified path is not a file");
     }
 
-    return entry.content; // Return the file's content
+    return entry.content; // return content
   }
 
-  // Delete a directory or file
+  // actually rm
   async deleteEntry(path) {
     const entry = await this.performTransaction(this.storeName, (store) => store.get(path));
     if (!entry) {
