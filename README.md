@@ -2,6 +2,7 @@
 
 A basic working operating system implemented in JavaScript. It has a file system clone command to clone git repos a calculator a text editor and a cool wallpaper app.
 
+To test it out just go to: https://andre-cmd-rgb.github.io/Web-OS-Gui/
 # Screenshots 📸
 
 ![{A23A752E-CEB6-4CB4-878A-12CAD601537E}](https://github.com/user-attachments/assets/8152b305-4a9d-4b64-ab16-b1c7c2eb2437)
