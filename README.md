@@ -11,7 +11,3 @@ A basic working operating system implemented in JavaScript. This project to crea
 
 ![{75F9C49B-2517-4AD7-A269-9A62D807AA1E}](https://github.com/user-attachments/assets/175fd826-d041-45f7-a811-b24215afbb39)
 
-
-
-
-Ai has been used in this project.
