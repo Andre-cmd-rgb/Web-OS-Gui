@@ -1,12 +1,12 @@
-// i will comment this file(when i have time)
-// bruh nvm i let the ai do it
 class Window {
+  static zIndexCounter = 100;
+
   constructor(title, content, iconPath = "app-icons/app.png", options = {}) {
     this.title = title;
     this.content = content;
     this.iconPath = iconPath;
     this.isMinimized = false;
-    this.isMaximized = false; // New property to track maximized state
+    this.isMaximized = false;
     this.taskbarItem = null;
 
     this.options = {
@@ -32,22 +32,19 @@ class Window {
     }
   
     const taskbar = document.getElementById("taskbar");
-    const taskbarHeight = taskbar ? taskbar.offsetHeight : 0;
-    const spacing = 60; // Add 10px spacing from taskbar
+    const spacing = 60;
   
     const windowDiv = document.createElement("div");
     windowDiv.classList.add("window");
     windowDiv.id = `window-${this.title}`;
     windowDiv.style.position = "absolute";
     windowDiv.style.left = `${this.options.left}px`;
-    
-    // Ensure initial top position leaves space from the taskbar
     windowDiv.style.top = `${Math.max(this.options.top, spacing)}px`;
-  
     windowDiv.style.width = `${this.options.width}px`;
     windowDiv.style.height = `${this.options.height}px`;
     windowDiv.style.minWidth = `${this.options.minWidth}px`;
     windowDiv.style.minHeight = `${this.options.minHeight}px`;
+    windowDiv.style.zIndex = ++Window.zIndexCounter;
   
     if (this.options.resizable) {
       windowDiv.classList.add("resizable");
@@ -64,20 +61,25 @@ class Window {
       </div>
     `;
   
-    header.querySelector(".close").addEventListener("click", () => this.closeWindow(windowDiv));
+    header.querySelector(".close").addEventListener("click", (e) => { e.stopPropagation(); this.closeWindow(windowDiv); });
     if (this.options.resizable) {
-      header.querySelector(".maximize").addEventListener("click", () => this.toggleMaximize(windowDiv));
+      header.querySelector(".maximize").addEventListener("click", (e) => { e.stopPropagation(); this.toggleMaximize(windowDiv); });
     }
-    header.querySelector(".minimize").addEventListener("click", () => this.minimizeWindow(windowDiv));
+    header.querySelector(".minimize").addEventListener("click", (e) => { e.stopPropagation(); this.minimizeWindow(windowDiv); });
   
     const contentDiv = document.createElement("div");
     contentDiv.classList.add("window-content");
+    let iframe = null;
+
     if (this.options.isExternal || this.isURL(this.content)) {
-      const iframe = document.createElement("iframe");
+      iframe = document.createElement("iframe");
       iframe.src = this.content;
       iframe.style.width = "100%";
       iframe.style.height = "100%";
       iframe.style.border = "none";
+      if (this.title === "Terminal") {
+        iframe.id = "terminal-iframe";
+      }
       contentDiv.appendChild(iframe);
     } else {
       contentDiv.innerHTML = this.content;
@@ -86,6 +88,13 @@ class Window {
     windowDiv.appendChild(header);
     windowDiv.appendChild(contentDiv);
   
+    windowDiv.addEventListener('mousedown', () => {
+      windowDiv.style.zIndex = ++Window.zIndexCounter;
+      if (iframe && iframe.id === "terminal-iframe" && iframe.contentWindow && iframe.contentWindow.webosInstance) {
+        iframe.contentWindow.webosInstance.focusInput();
+      }
+    }, true);
+    
     if (this.options.draggable) {
       this.makeWindowDraggable(windowDiv);
     }
@@ -98,25 +107,21 @@ class Window {
     this.addToTaskbar();
   }
   
-
   toggleMaximize(windowElement) {
     if (!this.options.resizable) return;
   
     const topbar = document.getElementById("topbar");
     const taskbar = document.getElementById("taskbar");
-  
     const topbarHeight = topbar ? topbar.offsetHeight : 0;
     const taskbarHeight = taskbar ? taskbar.offsetHeight : 0;
   
     if (this.isMaximized) {
-      // Restore original size and position
       windowElement.style.width = `${this.options.width}px`;
       windowElement.style.height = `${this.options.height}px`;
       windowElement.style.left = `${this.options.left}px`;
       windowElement.style.top = `${this.options.top}px`;
       this.isMaximized = false;
     } else {
-      // Maximize to available space (excluding top bar and taskbar)
       windowElement.style.width = "100%";
       windowElement.style.height = `calc(100% - ${topbarHeight + taskbarHeight}px)`;
       windowElement.style.left = "0";
@@ -124,16 +129,13 @@ class Window {
       this.isMaximized = true;
     }
   }
-  
-  
-  
 
   minimizeWindow(windowElement) {
     windowElement.style.display = "none";
     this.isMinimized = true;
 
     if (this.taskbarItem) {
-      this.taskbarItem.classList.add("taskbar-item-hidden"); // Add hidden class
+      this.taskbarItem.classList.add("taskbar-item-hidden");
     }
   }
 
@@ -146,7 +148,9 @@ class Window {
 
   makeWindowDraggable(windowElement) {
     let offsetX, offsetY;
-    windowElement.querySelector(".window-header").onmousedown = (e) => {
+    const header = windowElement.querySelector(".window-header");
+    header.onmousedown = (e) => {
+      e.stopPropagation();
       offsetX = e.clientX - windowElement.offsetLeft;
       offsetY = e.clientY - windowElement.offsetTop;
 
@@ -221,18 +225,15 @@ class Window {
 
   restoreWindow() {
     const windowElement = document.getElementById(`window-${this.title}`);
-  
     if (!windowElement) return;
   
     if (this.isMinimized) {
-      // Restore the window if it's minimized
       windowElement.style.display = "block";
       this.isMinimized = false;
       if (this.taskbarItem) {
         this.taskbarItem.classList.remove("taskbar-item-hidden");
       }
     } else {
-      // Minimize the window if it's currently visible
       windowElement.style.display = "none";
       this.isMinimized = true;
       if (this.taskbarItem) {
@@ -241,8 +242,6 @@ class Window {
     }
   }  
 }
-
-
 
 class NotificationManager {
   constructor() {

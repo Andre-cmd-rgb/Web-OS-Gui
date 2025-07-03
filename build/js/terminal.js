@@ -1,5 +1,5 @@
 import FileSystem from './fs.js';
-import CommandHistoryManager from './history.js'; 
+import CommandHistoryManager from './history.js';
 import { commands } from './commands.js';
 
 class WebOS {
@@ -25,95 +25,92 @@ class WebOS {
     this.setupInputListener();
   }
 
-newPrompt() {
-  const promptLine = document.createElement("div");
-  promptLine.classList.add("prompt-line");
-  promptLine.innerHTML = `${this.prompt}<span id="input-line" contenteditable="true"></span>`;
-  this.terminal.appendChild(promptLine);
+  newPrompt() {
+    const promptLine = document.createElement("div");
+    promptLine.classList.add("prompt-line");
+    promptLine.innerHTML = `${this.prompt}<span id="input-line" contenteditable="true"></span>`;
+    this.terminal.appendChild(promptLine);
 
-  const inputLine = document.querySelector("#input-line");
+    const inputLine = document.querySelector("#input-line");
 
-  // get out autocorrect
-  inputLine.setAttribute("spellcheck", "false");
-  inputLine.setAttribute("autocapitalize", "none");
-  inputLine.setAttribute("autocomplete", "off");
-  inputLine.setAttribute("autocorrect", "off");
-  inputLine.focus();
+    inputLine.setAttribute("spellcheck", "false");
+    inputLine.setAttribute("autocapitalize", "none");
+    inputLine.setAttribute("autocomplete", "off");
+    inputLine.setAttribute("autocorrect", "off");
+    
+    this.focusInput(); 
+    this.scrollTerminal();
+  }
 
-  // fix
-  const range = document.createRange();
-  range.selectNodeContents(inputLine);
-  range.collapse(false);
-
-  const selection = window.getSelection();
-  selection.removeAllRanges();
-  selection.addRange(range);
-
-  // focus input on tap
-  inputLine.addEventListener("touchstart", () => inputLine.focus());
-
-  this.scrollTerminal();
-}
-  
-  setupInputListener() {
-  document.addEventListener("keydown", async (event) => {
-    const inputElement = document.querySelector("#input-line");
-    if (!inputElement) return;
-
-    if (event.ctrlKey || event.metaKey) return;
-
-    switch (event.key) {
-      case "Enter":
-        event.preventDefault();
-        const command = inputElement.textContent.trim();
-        await this.processCommand(command);
-        await this.commandHistoryManager.saveCommandToHistory(command);
-        inputElement.removeAttribute("contenteditable");
-        inputElement.removeAttribute("id");
-        this.newPrompt();
-        break;
-      case "ArrowUp":
-      case "ArrowDown":
-        this.commandHistoryManager.handleArrowKeyNavigation(event, inputElement);
-        break;
-      default:
-        break;
+  focusInput() {
+    const inputElement = this.terminal.querySelector("#input-line");
+    if (inputElement) {
+      inputElement.focus();
+      const range = document.createRange();
+      const sel = window.getSelection();
+      range.selectNodeContents(inputElement);
+      range.collapse(false);
+      sel.removeAllRanges();
+      sel.addRange(range);
     }
-  });
+  }
 
-  // pastep
-  document.addEventListener("paste", (event) => {
-    const inputElement = document.querySelector("#input-line");
-    if (!inputElement) return;
+  setupInputListener() {
+    document.addEventListener("keydown", async (event) => {
+      const inputElement = document.querySelector("#input-line");
+      if (!inputElement) return;
 
-    event.preventDefault();
-    const pastedText = event.clipboardData.getData("text");
-    const currentText = inputElement.textContent;
-    inputElement.textContent = currentText + pastedText;
+      if (event.ctrlKey || event.metaKey) return;
 
-    // end
-    const range = document.createRange();
-    range.selectNodeContents(inputElement);
-    range.collapse(false);
+      switch (event.key) {
+        case "Enter":
+          event.preventDefault();
+          const command = inputElement.textContent.trim();
+          inputElement.removeAttribute("contenteditable");
+          inputElement.removeAttribute("id");
+          await this.processCommand(command);
+          if (command) {
+            await this.commandHistoryManager.saveCommandToHistory(command);
+          }
+          this.newPrompt();
+          break;
+        case "ArrowUp":
+        case "ArrowDown":
+          event.preventDefault();
+          this.commandHistoryManager.handleArrowKeyNavigation(event, inputElement);
+          break;
+        default:
+          break;
+      }
+    });
 
-    const selection = window.getSelection();
-    selection.removeAllRanges();
-    selection.addRange(range);
-  });
+    document.addEventListener("paste", (event) => {
+      const inputElement = document.querySelector("#input-line");
+      if (!inputElement) return;
 
-  //  focus
-  this.terminal.addEventListener("touchstart", () => {
-    const inputElement = document.querySelector("#input-line");
-    if (inputElement) inputElement.focus();
-  });
-}
+      event.preventDefault();
+      const pastedText = event.clipboardData.getData("text");
+      const currentText = inputElement.textContent;
+      inputElement.textContent = currentText + pastedText;
+      this.focusInput();
+    });
+    
+    this.terminal.addEventListener('click', () => {
+        this.focusInput();
+    });
+
+    this.terminal.addEventListener("touchstart", () => {
+      this.focusInput();
+    });
+  }
+
   async processCommand(command) {
     if (!command) return;
 
     const [cmd, ...args] = command.split(" ");
     try {
       if (commands[cmd]) {
-        await commands[cmd](this, args); // Call the command from commands.js
+        await commands[cmd](this, args);
       } else {
         this.commandNotFound(cmd);
       }
@@ -126,23 +123,25 @@ newPrompt() {
     this.print(`Unknown command: ${cmd}`);
   }
 
-
-  print(text) {
+  print(text, options = {}) {
     const outputLine = document.createElement("div");
-    outputLine.innerHTML = text;
+    if (options.isHTML) {
+      outputLine.innerHTML = text;
+    } else {
+      outputLine.textContent = text;
+    }
     this.terminal.appendChild(outputLine);
     this.scrollTerminal();
   }
-  
+
   clearScreen() {
     this.terminal.innerHTML = "";
-    this.print("Screen cleared.");
   }
 
   scrollTerminal() {
     this.terminal.scrollTop = this.terminal.scrollHeight;
   }
-
+  
   _getFullPath(path) {
     if (path.startsWith("/")) {
       return path;
@@ -154,7 +153,6 @@ newPrompt() {
   async _updateParentDirectory(filePath) {
     const parentPath = this._getParentDirectory(filePath);
     const parentDir = await this.fileSystem.performTransaction(this.fileSystem.storeName, (store) => store.get(parentPath));
-
     if (parentDir && parentDir.type === "directory") {
       if (!parentDir.contents.includes(filePath)) {
         parentDir.contents.push(filePath);
@@ -177,5 +175,5 @@ newPrompt() {
 
 window.onload = () => {
   const terminalElement = document.getElementById("terminal");
-  new WebOS(terminalElement);
+  window.webosInstance = new WebOS(terminalElement);
 };

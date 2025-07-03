@@ -2,7 +2,7 @@
 
 export const commands = {
     help(terminal) {
-      terminal.print(`
+      const helpText = `
         <strong>Available Commands:</strong>
         <ul>
           <li><strong>help</strong>: Displays this list of commands.</li>
@@ -18,7 +18,8 @@ export const commands = {
           <li><strong>wget [url] [filename]</strong>: Fetches the content from the specified <em>[url]</em> and saves it to a file named <em>[filename]</em>.</li>
           <li><strong>clone [repo-url] [optional-directory-name]</strong>: Clones the GitHub repository from the specified <em>[repo-url]</em> into an optional directory name.</li>
         </ul>
-      `);
+      `;
+      terminal.print(helpText, { isHTML: true });
     },   
     
       async mkdir(terminal, args) {
@@ -44,12 +45,10 @@ export const commands = {
           terminal.print(`Running script '${args[0]}'...`);
           const data = await terminal.fileSystem.readFile(filePath);
       
-          // Create a context for the script with access to `print`
           const scriptContext = {
             print: (message) => terminal.print(message),
           };
       
-          // Use Function constructor to execute the script in the provided context
           const scriptFunction = new Function("context", `
             with (context) {
               ${data}
@@ -104,23 +103,21 @@ export const commands = {
       
         const data = await terminal.fileSystem.readFile(filePath);
       
-        // Check if file ends with `.md`
         if (args[0].endsWith(".md")) {
           const rendered = data
-            .replace(/^# (.+)/gm, "<h1>$1</h1>") // Render # Header
-            .replace(/^## (.+)/gm, "<h2>$1</h2>") // Render ## Header
-            .replace(/^### (.+)/gm, "<h3>$1</h3>") // Render ### Header
-            .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>") // Render **bold**
-            .replace(/\*(.+?)\*/g, "<em>$1</em>") // Render *italic*
-            .replace(/!\[(.*?)\]\((.+?)\)/g, '<img alt="$1" src="$2" />') // Render ![alt](url)
-            .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" target="_blank">$1</a>') // Render [text](url)
-            .replace(/\n/g, "<br>"); // Replace newlines with <br> for display
+            .replace(/^# (.+)/gm, "<h1>$1</h1>")
+            .replace(/^## (.+)/gm, "<h2>$1</h2>")
+            .replace(/^### (.+)/gm, "<h3>$1</h3>")
+            .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+            .replace(/\*(.+?)\*/g, "<em>$1</em>")
+            .replace(/!\[(.*?)\]\((.+?)\)/g, '<img alt="$1" src="$2" />')
+            .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" target="_blank">$1</a>')
+            .replace(/\n/g, "<br>");
       
-          terminal.print(rendered);
+          terminal.print(rendered, { isHTML: true });
         } else {
-          // For plain text files, preserve line breaks
           const formattedData = data.replace(/\n/g, "<br>");
-          terminal.print(formattedData);
+          terminal.print(formattedData, { isHTML: true });
         }
       },
   
@@ -137,7 +134,6 @@ export const commands = {
         terminal.clearScreen();
       },
       async wget(terminal, args) {
-        // Validate arguments
         if (args.length < 2) {
             throw new Error("Usage: wget [url] [filename]");
         }
@@ -146,7 +142,6 @@ export const commands = {
         const fileName = args[1].trim();
         const filePath = terminal._getFullPath(fileName);
     
-        // Check if the file already exists
         const fileExists = await terminal._checkIfPathExists(filePath);
         if (fileExists) {
             terminal.print(`Error: File '${fileName}' already exists.`);
@@ -156,7 +151,6 @@ export const commands = {
         try {
             terminal.print(`Fetching content from '${url}'...`);
     
-            // Fetch the URL content
             const response = await fetch(url);
             if (!response.ok) {
                 throw new Error(`Failed to fetch URL: ${response.status} ${response.statusText}`);
@@ -167,7 +161,6 @@ export const commands = {
                 throw new Error(`The fetched content from '${url}' is empty.`);
             }
     
-            // Save the content to the file system
             await terminal.fileSystem.createFile(filePath, content);
             await terminal._updateParentDirectory(filePath);
     
@@ -179,7 +172,7 @@ export const commands = {
       async clone(terminal, args) {
         if (args.length < 1) throw new Error("Usage: clone [repo-url] [optional-directory-name]");
       
-        const repoUrl = args[0].replace(/^['"]|['"]$/g, ""); // Remove quotes
+        const repoUrl = args[0].replace(/^['"]|['"]$/g, "");
         const repoName = args[1] || repoUrl.split('/').pop().replace('.git', '');
         const targetPath = terminal._getFullPath(repoName);
       
@@ -192,7 +185,6 @@ export const commands = {
         try {
           terminal.print(`Cloning repository '${repoUrl}'...`);
       
-          // Fetch repository metadata
           const metadataResponse = await fetch(metadataUrl);
           if (!metadataResponse.ok) {
             throw new Error(`Failed to fetch repository metadata: ${metadataResponse.status}`);
@@ -201,7 +193,6 @@ export const commands = {
           const metadata = await metadataResponse.json();
           const branch = metadata.default_branch || "main";
       
-          // Fetch repository tree
           const apiUrl = `https://api.github.com/repos/${owner}/${repo}/git/trees/${branch}?recursive=1`;
           const response = await fetch(apiUrl);
           if (!response.ok) {
@@ -211,11 +202,9 @@ export const commands = {
           const repoData = await response.json();
           if (!repoData.tree) throw new Error("Failed to retrieve repository structure.");
       
-          // Create root directory
           await terminal.fileSystem.createDirectory(targetPath);
           await terminal._updateParentDirectory(targetPath);
       
-          // Save repository files
           for (const item of repoData.tree) {
             const itemPath = `${targetPath}/${item.path}`;
             if (item.type === "tree") {
@@ -258,4 +247,3 @@ export const commands = {
         }
       }
     };
-    
